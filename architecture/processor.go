@@ -8,6 +8,7 @@ type Processor struct {
   clockSpeed int
   numExUnits int
   printDebug bool
+  rf RegisterFile
 }
 
 
