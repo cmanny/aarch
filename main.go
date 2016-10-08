@@ -8,5 +8,6 @@ import (
 
 func main() {
   p := &architecture.Processor{}
+  p.Debug(true)
   p.Run()
 }
