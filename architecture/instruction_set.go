@@ -33,7 +33,9 @@ const (
 )
 
 const (
-	INS_ADD = iota
+  INS_HALT = iota
+
+	INS_ADD
 	INS_SUB
 	INS_MUL
 
@@ -114,6 +116,7 @@ func (is* InstructionSet) RegStrDecode(reg string) int {
 }
 
 func (is* InstructionSet) strMapsInit() {
+
   is.ins_str["add"] = INS_ADD
   is.ins_str["sub"] = INS_SUB
   is.ins_str["mul"] = INS_MUL
@@ -136,6 +139,7 @@ func (is* InstructionSet) strMapsInit() {
   is.ins_str["jge"] = INS_JGE
 
   is.ins_str["cmp"] = INS_CMP
+  is.ins_str["halt"] = INS_HALT
 
   /* Reg maps */
 
@@ -175,9 +179,11 @@ func (is* InstructionSet) insMapInit() {
 	is.ins_map[INS_JNE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS, OP_EMPTY, OP_EMPTY}
 	is.ins_map[INS_JL] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS, OP_EMPTY, OP_EMPTY}
 	is.ins_map[INS_JGE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS, OP_EMPTY, OP_EMPTY}
+  is.ins_map[INS_HALT] = InsInfo{INS_TYPE_CONTROL, OP_EMPTY, OP_EMPTY, OP_EMPTY}
 
 	/* Logical */
 
 	is.ins_map[INS_CMP] = InsInfo{INS_TYPE_LOGIC, OP_REGISTER, OP_REGISTER, OP_EMPTY}
+
 
 }
