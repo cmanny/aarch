@@ -6,7 +6,8 @@ import (
 )
 
 type RegisterFile struct {
-  Data [32]int
+  Data [32] int
+  Flags int
 }
 
 func (rf* RegisterFile) Contents() {

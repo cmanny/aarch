@@ -9,6 +9,11 @@ import (
 
 type Assembler struct {
   inFile string
+  is* InstructionSet
+}
+
+func (as* Assembler) Init(is* InstructionSet) {
+  as.is = is
 }
 
 func (a* Assembler) LoadFile(fileName string) {
