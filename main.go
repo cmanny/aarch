@@ -1,7 +1,8 @@
 package main
 
 import (
-  //"fmt"
+  "fmt"
+  "flag"
 
   "github.com/cmanny/aarch/architecture"
 )
@@ -18,9 +19,21 @@ import (
 **/
 
 func main() {
+
+  fileNamePtr := flag.String("prog", "fib.gp", "file to assemble and run")
+  runWebPtr := flag.Bool("web", true, "bool to run web front end")
+
+  flag.Parse()
+
+
   p := &architecture.Processor{}
   mem := &architecture.Memory{}
   as := &architecture.Assembler{}
+
+  fmt.Println(*fileNamePtr, *runWebPtr, *mem, *as)
+
+
+
 
   p.Debug(true)
   p.Run()
