@@ -16,6 +16,7 @@ func (a* Assembler) LoadFile(fileName string) {
   if err != nil {
     panic(err)
   }
+  defer f.Close()
   scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
 
