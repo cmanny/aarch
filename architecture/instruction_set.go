@@ -1,5 +1,9 @@
 package architecture
 
+import (
+  "fmt"
+)
+
 /* In enumerations */
 const (
 
@@ -71,48 +75,48 @@ const (
 )
 
 type InsInfo struct {
-	ins_type int
-	op1      int
-	op2      int
-	op3      int
+	Ins_type int
+	Op1      int
+	Op2      int
+	Op3      int
 }
 
 type InstructionSet struct {
-  ins_map map[int]InsInfo
-  ins_str map[string]int
-  reg_str map[string]int
+  ins_map map[byte]InsInfo
+  ins_str map[string]byte
+  reg_str map[string]byte
 }
 
 
 func (is* InstructionSet) Init() {
-  is.ins_map = make(map[int]InsInfo)
-  is.ins_str = make(map[string]int)
-  is.reg_str = make(map[string]int)
+  is.ins_map = make(map[byte]InsInfo)
+  is.ins_str = make(map[string]byte)
+  is.reg_str = make(map[string]byte)
 
 
   is.insMapInit()
   is.strMapsInit()
 }
 
-func (is* InstructionSet) InsStrDecode(ins string) int {
+func (is* InstructionSet) InsStrDecode(ins string) (byte, error ){
   if val, ok := is.ins_str[ins]; ok {
-    return val
+    return val, nil
   }
-  return -1
+  return 255, fmt.Errorf("could not find instruction string in mapping")
 }
 
-func (is* InstructionSet) InsIdDecode(id int) InsInfo {
+func (is* InstructionSet) InsIdDecode(id byte) (InsInfo, error) {
   if val, ok := is.ins_map[id]; ok {
-    return val
+    return val, nil
   }
-  return InsInfo{-1, -1, -1, -1}
+  return InsInfo{-1, -1, -1, -1}, fmt.Errorf("could not find instruction id in mapping")
 }
 
-func (is* InstructionSet) RegStrDecode(reg string) int {
+func (is* InstructionSet) RegStrDecode(reg string) (byte, error) {
   if val, ok := is.reg_str[reg]; ok {
-    return val
+    return val, nil
   }
-  return -1
+  return 255, fmt.Errorf("could not find reg str in mapping")
 }
 
 func (is* InstructionSet) strMapsInit() {

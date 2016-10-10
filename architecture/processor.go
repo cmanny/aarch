@@ -8,7 +8,9 @@ type Processor struct {
   clockSpeed int
   numExUnits int
   printDebug bool
+
   rf RegisterFile
+  is* InstructionSet
 }
 
 
@@ -43,8 +45,8 @@ func (p* Processor) writeback() {
 **/
 
 
-func (p* Processor) Init() {
-  
+func (p* Processor) Init(is* InstructionSet) {
+  p.is = is
 }
 
 func (p* Processor) Debug(toggle bool) {

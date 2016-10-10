@@ -1,12 +1,12 @@
 .code
-  movi a 0x00
-  movi b 0x01
-  movi c 0x0a
+  movi a 0
+  movi b 1
+  movi c 10
 .loopstart
   mov  d b
   add  b b a
   mov  a a
-  subi c 0x01
+  subi c 1
   jne  .loopstart
   halt
 

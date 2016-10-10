@@ -2,6 +2,7 @@ package main
 
 import (
   "fmt"
+  "log"
   "flag"
 
   "github.com/cmanny/aarch/architecture"
@@ -25,11 +26,12 @@ func main() {
 
   flag.Parse()
 
+  /* Init top level components */
 
   is  := &architecture.InstructionSet{}
   is.Init()
   p   := &architecture.Processor{}
-  p.Init()
+  p.Init(is)
   mem := &architecture.Memory{}
   mem.Init()
   as  := &architecture.Assembler{}
@@ -40,8 +42,10 @@ func main() {
   bytes, err := as.AssembleFile(*fileNamePtr)
 
   if err != nil {
-    fmt.Println("Could not assemble file")
+    log.Fatal(err)
   }
+
+  /* Fill memory with compilde bytes */
 
   mem.Fill(bytes, 0)
 
