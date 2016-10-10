@@ -43,6 +43,10 @@ func (p* Processor) writeback() {
 **/
 
 
+func (p* Processor) Init() {
+  
+}
+
 func (p* Processor) Debug(toggle bool) {
   p.printDebug = toggle
 }

@@ -26,11 +26,29 @@ func main() {
   flag.Parse()
 
 
-  p := &architecture.Processor{}
+  is  := &architecture.InstructionSet{}
+  is.Init()
+  p   := &architecture.Processor{}
+  p.Init()
   mem := &architecture.Memory{}
-  as := &architecture.Assembler{}
+  mem.Init()
+  as  := &architecture.Assembler{}
+  as.Init(is)
 
-  fmt.Println(*fileNamePtr, *runWebPtr, *mem, *as)
+  /* Begin */
+
+  bytes, err := as.AssembleFile(*fileNamePtr)
+
+  if err != nil {
+    fmt.Println("Could not assemble file")
+  }
+
+  mem.Fill(bytes, 0)
+
+
+
+
+  fmt.Errorf(*fileNamePtr, *runWebPtr, *mem, *as)
 
 
 
