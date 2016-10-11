@@ -27,13 +27,17 @@ const (
 	OP_EMPTY = iota
 
 	/* Memory address constant */
-	OP_ADDRESS
+  OP_ADDRESS_8
+
+	OP_ADDRESS_32
 
 	/* Register identifier */
 	OP_REGISTER
 
 	/* Constant value */
-	OP_CONSTANT
+	OP_CONSTANT_8
+
+  OP_CONSTANT_32
 )
 
 const (
@@ -55,10 +59,19 @@ const (
 	INS_LDR
 	INS_STR
 
+/** Use local jumps and absolute jumps, so that the processor can
+    make better guesses at which data to load into the cache and pipeline
+**/
+
 	INS_JEQ
 	INS_JNE
 	INS_JL
 	INS_JGE
+
+  INS_AJEQ
+  INS_AJNE
+  INS_AJL
+  INS_AJGE
 
 	INS_CMP
 )
@@ -142,6 +155,11 @@ func (is* InstructionSet) strMapsInit() {
   is.ins_str["jl"] = INS_JL
   is.ins_str["jge"] = INS_JGE
 
+  is.ins_str["ajeq"] = INS_AJEQ
+  is.ins_str["ajne"] = INS_AJNE
+  is.ins_str["ajl"] = INS_AJL
+  is.ins_str["ajge"] = INS_AJGE
+
   is.ins_str["cmp"] = INS_CMP
   is.ins_str["halt"] = INS_HALT
 
@@ -164,25 +182,32 @@ func (is* InstructionSet) insMapInit() {
 	is.ins_map[INS_SUB] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
 	is.ins_map[INS_MUL] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
 
-	is.ins_map[INS_ADDI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT, OP_EMPTY}
-	is.ins_map[INS_SUBI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT, OP_EMPTY}
-	is.ins_map[INS_MULI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT, OP_EMPTY}
+	is.ins_map[INS_ADDI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
+	is.ins_map[INS_SUBI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
+	is.ins_map[INS_MULI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
 
-	is.ins_map[INS_LEA] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_ADDRESS, OP_CONSTANT}
+	is.ins_map[INS_LEA] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_ADDRESS_32, OP_CONSTANT_32}
 
 	/* Data movement */
 	is.ins_map[INS_MOV] = InsInfo{INS_TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
-	is.ins_map[INS_MOVI] = InsInfo{INS_TYPE_MOVE, OP_REGISTER, OP_CONSTANT, OP_EMPTY}
+	is.ins_map[INS_MOVI] = InsInfo{INS_TYPE_MOVE, OP_REGISTER, OP_CONSTANT_32, OP_EMPTY}
 
 	is.ins_map[INS_LDR] = InsInfo{INS_TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
 	is.ins_map[INS_STR] = InsInfo{INS_TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
 
 	/* Control flow */
 
-	is.ins_map[INS_JEQ] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS, OP_EMPTY, OP_EMPTY}
-	is.ins_map[INS_JNE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS, OP_EMPTY, OP_EMPTY}
-	is.ins_map[INS_JL] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS, OP_EMPTY, OP_EMPTY}
-	is.ins_map[INS_JGE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS, OP_EMPTY, OP_EMPTY}
+	is.ins_map[INS_JEQ] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
+	is.ins_map[INS_JNE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
+	is.ins_map[INS_JL] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
+	is.ins_map[INS_JGE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
+
+  is.ins_map[INS_AJEQ] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_32, OP_REGISTER, OP_EMPTY}
+	is.ins_map[INS_AJNE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_32, OP_REGISTER, OP_EMPTY}
+	is.ins_map[INS_AJL] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_32, OP_REGISTER, OP_EMPTY}
+	is.ins_map[INS_AJGE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_32, OP_REGISTER, OP_EMPTY}
+
+
   is.ins_map[INS_HALT] = InsInfo{INS_TYPE_CONTROL, OP_EMPTY, OP_EMPTY, OP_EMPTY}
 
 	/* Logical */
