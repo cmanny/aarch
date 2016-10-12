@@ -7,7 +7,7 @@
   add  b b a
   mov  a a
   subi c 1
-  jne  .loopstart
+  jne  .loopstart c
   halt
 
 .data
