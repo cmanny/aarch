@@ -4,7 +4,6 @@ import (
   "bufio"
   "os"
   "strings"
-  "fmt"
   "encoding/binary"
   "strconv"
 )
@@ -42,7 +41,6 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
     if len(words) == 0 {
       continue
     }
-    fmt.Println(words)
     if words[0][0] == '.' {
       /* label */
       as.labelIndex[words[0][1:]] = byteIndex
@@ -160,9 +158,6 @@ func (as* Assembler) AssembleFile(fileName string) ([]byte, error) {
       return nil, err
     }
   }
-
-  fmt.Println(as.labelIndex)
-  fmt.Println(bytes)
 
   return bytes, err
 }
