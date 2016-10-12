@@ -6,6 +6,7 @@ import (
   "flag"
 
   "github.com/cmanny/aarch/architecture"
+  "github.com/cmanny/aarch/web"
 )
 
 /**
@@ -28,6 +29,7 @@ func main() {
 
   /* Init top level components */
 
+  /* Architectural components */
   is  := &architecture.InstructionSet{}
   is.Init()
   p   := &architecture.Processor{}
@@ -36,6 +38,13 @@ func main() {
   mem.Init()
   as  := &architecture.Assembler{}
   as.Init(is)
+
+  /* Visualisation components */
+
+  serv := &server.Server{}
+  serv.Init("8080")
+
+
 
   /* Begin */
 
@@ -54,9 +63,10 @@ func main() {
 
   fmt.Errorf(*fileNamePtr, *runWebPtr, *mem, *as)
 
-
-
-
   p.Debug(true)
   p.Run()
+  if *runWebPtr {
+    fmt.Println("Runnign web")
+    serv.Run()
+  }
 }
