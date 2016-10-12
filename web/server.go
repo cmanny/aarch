@@ -5,6 +5,7 @@ import (
   "html"
   "fmt"
   "log"
+//  "strings"
 )
 
 type Server struct {
@@ -17,6 +18,9 @@ func (s* Server) Init(port string){
 
 func (s* Server) Run() {
 
+  http.HandleFunc("/vis/", func(w http.ResponseWriter, r *http.Request) {
+  	http.ServeFile(w, r, "web/" + r.URL.Path[1:])
+  })
   http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
   	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
   })
