@@ -2,10 +2,8 @@ package server
 
 import (
   "net/http"
-  "html"
   "fmt"
   "log"
-//  "strings"
 )
 
 type Server struct {
@@ -21,8 +19,14 @@ func (s* Server) Run() {
   http.HandleFunc("/vis/", func(w http.ResponseWriter, r *http.Request) {
   	http.ServeFile(w, r, "web/" + r.URL.Path[1:])
   })
+
+  http.HandleFunc("/api/", func(w, http.ResponseWriter, r* http.Request) {
+    /* Fill in with json requests */
+    return
+  })
+
   http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-  	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+    http.ServeFile(w, r, "web/index.html")
   })
   log.Fatal(http.ListenAndServe(":" + s.port, nil))
   fmt.Println("done")
