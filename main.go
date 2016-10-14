@@ -42,7 +42,7 @@ func main() {
   /* Visualisation components */
 
   serv := &server.Server{}
-  serv.Init("8080")
+  serv.Init("8080   ")
 
 
 
@@ -58,6 +58,7 @@ func main() {
 
   mem.Fill(bytes, 0)
 
+  fmt.Println(mem.Data)
 
 
 

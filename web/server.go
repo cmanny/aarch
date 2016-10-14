@@ -20,7 +20,7 @@ func (s* Server) Run() {
   	http.ServeFile(w, r, "web/" + r.URL.Path[1:])
   })
 
-  http.HandleFunc("/api/", func(w, http.ResponseWriter, r* http.Request) {
+  http.HandleFunc("/api/", func(w http.ResponseWriter, r* http.Request) {
     /* Fill in with json requests */
     return
   })
