@@ -57,6 +57,7 @@ func main() {
   /* Fill memory with compilde bytes */
 
   mem.Fill(bytes, 0)
+  p.SetIP(0)
 
   fmt.Println(mem.Data)
 

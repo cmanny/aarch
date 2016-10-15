@@ -9,6 +9,8 @@ type Processor struct {
   numExUnits int
   printDebug bool
 
+  ip int
+
   rf RegisterFile
   is* InstructionSet
 }
@@ -51,6 +53,10 @@ func (p* Processor) Init(is* InstructionSet) {
 
 func (p* Processor) Debug(toggle bool) {
   p.printDebug = toggle
+}
+
+func (p* Processor) SetIP(ip int) {
+  p.ip = ip
 }
 
 
