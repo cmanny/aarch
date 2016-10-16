@@ -4,4 +4,5 @@ package architecture
 type Component interface {
   Data() interface{}
   State() string
+  Cycle() /* advance one cycle */
 }

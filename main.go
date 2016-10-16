@@ -59,10 +59,6 @@ func main() {
   mem.Fill(bytes, 0)
   p.SetIP(0)
 
-  fmt.Println(mem.Data)
-
-
-
   fmt.Errorf(*fileNamePtr, *runWebPtr, *mem, *as)
 
   p.Debug(true)
