@@ -1,11 +1,11 @@
-package architecture
+package comp
 
 type Memory struct {
   Data [4096] byte
 }
 
 func (m* Memory) Init() {
-  
+
 }
 
 func (m* Memory) Fill(bytes []byte, index int) {

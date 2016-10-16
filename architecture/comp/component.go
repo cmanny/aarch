@@ -1,4 +1,4 @@
-package architecture
+package comp
 
 /* All components must satisfy the component functions */
 type Component interface {

@@ -2,6 +2,9 @@ package architecture
 
 import (
   "fmt"
+  "github.com/cmanny/aarch/architecture/comp"
+//  "github.com/cmanny/aarch/architecture/comp/exe"
+  "github.com/cmanny/aarch/architecture/ins"
 )
 
 type Processor struct {
@@ -11,8 +14,8 @@ type Processor struct {
 
   ip int
 
-  rf RegisterFile
-  is* InstructionSet
+  rf comp.RegisterFile
+  is* ins.InstructionSet
 }
 
 
@@ -47,7 +50,7 @@ func (p* Processor) writeback() {
 **/
 
 
-func (p* Processor) Init(is* InstructionSet) {
+func (p* Processor) Init(is* ins.InstructionSet) {
   p.is = is
 }
 

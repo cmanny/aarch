@@ -6,6 +6,9 @@ import (
   "flag"
 
   "github.com/cmanny/aarch/architecture"
+  "github.com/cmanny/aarch/architecture/ins"
+  "github.com/cmanny/aarch/architecture/comp"
+
   "github.com/cmanny/aarch/web"
 )
 
@@ -30,13 +33,13 @@ func main() {
   /* Init top level components */
 
   /* Architectural components */
-  is  := &architecture.InstructionSet{}
+  is  := &ins.InstructionSet{}
   is.Init()
   p   := &architecture.Processor{}
   p.Init(is)
-  mem := &architecture.Memory{}
+  mem := &comp.Memory{}
   mem.Init()
-  as  := &architecture.Assembler{}
+  as  := &ins.Assembler{}
   as.Init(is)
 
   /* Visualisation components */

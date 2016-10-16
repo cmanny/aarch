@@ -1,5 +1,5 @@
-package architecture
+package exe
 
 type MemoryUnit struct {
-  
+
 }
