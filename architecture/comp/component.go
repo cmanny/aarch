@@ -5,7 +5,7 @@ type Component interface {
   Data() interface{}
   State() string
   Cycle() /* advance one cycle */
-  Communicator() /* retrieve the communicator */
+  Communicator() *Communicator /* retrieve the communicator */
 }
 
 /* All components need communicators */
