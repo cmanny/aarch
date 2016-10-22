@@ -33,7 +33,7 @@ func intStrToBytes(str string) ([]byte, error){
 
 func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, error) {
 
-  byteIndex := 0
+  insCount := 0
   bytes := make([]byte, 0)
   for scanner.Scan() {
     line := scanner.Text()
@@ -43,7 +43,7 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
     }
     if words[0][0] == '.' {
       /* label */
-      as.labelIndex[words[0][1:]] = byteIndex
+      as.labelIndex[words[0][1:]] = insCount * 4
 
       /* if code section, continue, if data section, parse hex data */
     } else {
@@ -56,16 +56,11 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
       if !labelOnly {
         bytes = append(bytes, id)
       }
-      byteIndex += 1
 
       for i, op := range []int{info.Op1, info.Op2, info.Op3} {
         /* First pass, only labels are resolved, so we only increment byte index */
         if labelOnly {
-          if op == OP_ADDRESS_32 || op == OP_CONSTANT_32 {
-            byteIndex += 4
-          }else{
-            byteIndex += 1
-          }
+          insCount++
           continue
         }
         op_str := ""
@@ -81,7 +76,6 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
               return nil, err
             }
             bytes = append(bytes, regId)
-            byteIndex += 1
           case OP_CONSTANT_8:
             /* load constant into bytes */
             bs, err := intStrToBytes(op_str)
@@ -90,19 +84,10 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
             }
             bytes = append(bytes, bs[0])
 
-            byteIndex += 1
-          case OP_CONSTANT_32:
-            bs, err := intStrToBytes(op_str)
-            if err != nil {
-              return nil, err
-            }
-            bytes = append(bytes, bs...)
-            byteIndex += 4
-
           case  OP_ADDRESS_8:
             /* can be label or address, usually label */
             if op_str[0] == '.' {
-              dist := as.labelIndex[op_str[1:]] - byteIndex
+              dist := as.labelIndex[op_str[1:]] / 4 - insCount
               bytes = append(bytes, byte(int8(dist)))
               continue
             }
@@ -111,24 +96,6 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
               return nil, err
             }
             bytes = append(bytes, bs[0])
-            byteIndex += 1
-            /* load address into bytes */
-          case OP_ADDRESS_32:
-            if op_str[0] == '.' {
-              bs := make([]byte, 4)
-              binary.LittleEndian.PutUint32(bs, uint32(as.labelIndex[op_str[1:]]))
-              if err != nil {
-                return nil, err
-              }
-              bytes = append(bytes,  bs...)
-              continue
-            }
-            bs, err := intStrToBytes(op_str)
-            if err != nil {
-              return nil, err
-            }
-            bytes = append(bytes, bs...)
-            byteIndex += 4
           case  OP_EMPTY:
             /* nothing */
           default:
