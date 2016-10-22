@@ -42,12 +42,15 @@ const (
 	INS_ADD
 	INS_SUB
 	INS_MUL
+  INS_XOR
 
 	INS_ADDI
 	INS_SUBI
 	INS_MULI
 
-	INS_LEA
+
+	INS_LEAL
+  INS_LEAH
 
 	INS_MOV
 	INS_MOVI
@@ -133,12 +136,14 @@ func (is* InstructionSet) strMapsInit() {
   is.ins_str["add"] = INS_ADD
   is.ins_str["sub"] = INS_SUB
   is.ins_str["mul"] = INS_MUL
+  is.ins_str["xor"] = INS_XOR
 
   is.ins_str["addi"] = INS_ADDI
   is.ins_str["subi"] = INS_SUBI
   is.ins_str["muli"] = INS_MULI
 
-  is.ins_str["lea"] = INS_LEA
+  is.ins_str["leal"] = INS_LEAL
+  is.ins_str["leah"] = INS_LEAH
 
   is.ins_str["mov"] = INS_MOV
   is.ins_str["movi"] = INS_MOVI
@@ -182,7 +187,8 @@ func (is* InstructionSet) insMapInit() {
 	is.ins_map[INS_SUBI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
 	is.ins_map[INS_MULI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
 
-	is.ins_map[INS_LEA] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
+	is.ins_map[INS_LEAL] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_CONSTANT_8}
+	is.ins_map[INS_LEAH] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_CONSTANT_8}
 
 	/* Data movement */
 	is.ins_map[INS_MOV] = InsInfo{INS_TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
