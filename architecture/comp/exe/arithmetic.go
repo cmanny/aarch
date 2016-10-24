@@ -1,35 +1,31 @@
 package exe
 
 import (
-  "github.com/cmanny/aarch/architecture/ins"
+  //"github.com/cmanny/aarch/architecture/ins"
   "github.com/cmanny/aarch/architecture/comp"
 )
 
 type ArithmeticUnit struct {
-
-  Init()
-  Data() interface{}
-  State() string
-  Cycle()
-  Communicator() *Communicator
+  com* comp.Communicator
 }
 
-func (au *Memory) Init() {
-  au.com = &Communicator{}
+func (au *ArithmeticUnit) Init() {
+  au.com = &comp.Communicator{}
+  au.com.Init()
 }
 
-func (au *Memory) Data() interface{} {
+func (au *ArithmeticUnit) Data() interface{} {
   return ""
 }
 
-func (au *Memory) State() string {
+func (au *ArithmeticUnit) State() string {
   return ""
 }
 
-func (au *Memory) Cycle() {
+func (au *ArithmeticUnit) Cycle() {
 
 }
 
-func (au *Memory) Communicator() *Communicator {
+func (au *ArithmeticUnit) Communicator() * comp.Communicator {
   return au.com
 }

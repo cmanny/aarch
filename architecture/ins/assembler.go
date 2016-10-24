@@ -56,11 +56,11 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
       if !labelOnly {
         bytes = append(bytes, id)
       }
+      insCount++
 
       for i, op := range []int{info.Op1, info.Op2, info.Op3} {
         /* First pass, only labels are resolved, so we only increment byte index */
         if labelOnly {
-          insCount++
           continue
         }
         op_str := ""
@@ -87,7 +87,7 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
           case  OP_ADDRESS_8:
             /* can be label or address, usually label */
             if op_str[0] == '.' {
-              dist := as.labelIndex[op_str[1:]] / 4 - insCount
+              dist := as.labelIndex[op_str[1:]] / 4 - insCount + 1
               bytes = append(bytes, byte(int8(dist)))
               continue
             }
@@ -98,6 +98,7 @@ func (as* Assembler) parse(scanner* bufio.Scanner, labelOnly bool) ([]byte, erro
             bytes = append(bytes, bs[0])
           case  OP_EMPTY:
             /* nothing */
+            bytes = append(bytes, 0x00)
           default:
         }
       }

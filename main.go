@@ -35,10 +35,10 @@ func main() {
   /* Architectural components */
   is  := &ins.InstructionSet{}
   is.Init()
-  p   := &architecture.Processor{}
-  p.Init(is)
   mem := &comp.Memory{}
   mem.Init()
+  p   := &architecture.Processor{}
+  p.Init(is, mem)
   as  := &ins.Assembler{}
   as.Init(is)
 
@@ -52,6 +52,7 @@ func main() {
   /* Begin */
 
   bytes, err := as.AssembleFile(*fileNamePtr)
+  fmt.Println(bytes)
 
   if err != nil {
     log.Fatal(err)

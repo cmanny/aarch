@@ -1,30 +1,31 @@
 package exe
 
 import (
-  "github.com/cmanny/aarch/architecture/ins"
+  //"github.com/cmanny/aarch/architecture/ins"
   "github.com/cmanny/aarch/architecture/comp"
 )
 
 type MemoryUnit struct {
-  com* Communicator
+  com* comp.Communicator
 }
 
-func (mu *Memory) Init() {
-  mu.com = &Communicator{}
+func (mu *MemoryUnit) Init() {
+  mu.com = &comp.Communicator{}
+  mu.com.Init()
 }
 
-func (mu *Memory) Data() interface{} {
+func (mu *MemoryUnit) Data() interface{} {
   return ""
 }
 
-func (mu *Memory) State() string {
+func (mu *MemoryUnit) State() string {
   return ""
 }
 
-func (mu *Memory) Cycle() {
+func (mu *MemoryUnit) Cycle() {
 
 }
 
-func (mu *Memory) Communicator() *Communicator {
+func (mu *MemoryUnit) Communicator() *comp.Communicator {
   return mu.com
 }

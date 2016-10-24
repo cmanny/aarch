@@ -1,16 +1,17 @@
 package exe
 
 import (
-  "github.com/cmanny/aarch/architecture/ins"
+  //"github.com/cmanny/aarch/architecture/ins"
   "github.com/cmanny/aarch/architecture/comp"
 )
 
 type LogicUnit struct {
-  com* Communicator
+  com* comp.Communicator
 }
 
 func (lu *LogicUnit) Init() {
-  lu.com = &Communicator{}
+  lu.com = &comp.Communicator{}
+  lu.com.Init()
 }
 
 func (lu *LogicUnit) Data() interface{} {
@@ -25,6 +26,6 @@ func (lu *LogicUnit) Cycle() {
 
 }
 
-func (lu *LogicUnit) Communicator() *Communicator {
+func (lu *LogicUnit) Communicator() *comp.Communicator {
   return lu.com
 }

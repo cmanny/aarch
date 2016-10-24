@@ -7,20 +7,25 @@ type Memory struct {
 }
 
 
-func (m *Memory) Init() {
-  m.com = &Communicator{}
+func (mu *Memory) Init() {
+  mu.com = &Communicator{}
+  mu.com.Init()
+
+  mu.com.Inputs["in1"] = make(chan interface{}, 1)
+  mu.com.Outputs["out1"] = make(chan interface{}, 1)
 }
 
-func (m *Memory) Data() interface{} {
+func (mu *Memory) Data() interface{} {
   return ""
 }
 
-func (m *Memory) State() string {
+func (mu *Memory) State() string {
   return ""
 }
 
-func (m *Memory) Cycle() {
-
+func (mu *Memory) Cycle() {
+  index := (<-mu.com.Inputs["in1"]).(int)
+  mu.com.Outputs["out1"] <- mu.bytes[index: index + 4]
 }
 
 func (m *Memory) Communicator() *Communicator {

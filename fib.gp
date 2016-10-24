@@ -2,7 +2,7 @@
   movi a 0
   movi b 1
   movi c 10
-  jmp .simple
+  jmp .complex
 .simple
   mov  d b
   add  b b a
@@ -19,6 +19,6 @@
   subi c c 1
   cmpi d c 0
   jne .complex d
-  halt
+  jmp 0
 
 .data

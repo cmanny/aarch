@@ -28,3 +28,8 @@ type Communicator struct {
   Inputs map[string]chan interface{}
   Outputs map[string]chan interface{}
 }
+
+func (c* Communicator) Init() {
+  c.Inputs = make(map[string]chan interface{})
+  c.Outputs = make(map[string]chan interface{})
+}
