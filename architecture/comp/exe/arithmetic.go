@@ -9,6 +9,7 @@ type ArithmeticUnit struct {
   comp.Communicator
 }
 
+
 func (au *ArithmeticUnit) Init() {
   au.InitComms()
 }
