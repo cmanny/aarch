@@ -27,7 +27,7 @@ func (rf *RegisterFile) State() string {
 }
 
 func (rf *RegisterFile) Cycle() {
-
+	rf.Outputs["out1"] <- rf.regs[(<-rf.Inputs["in1"]).(int)]
 }
 
 func (rf *RegisterFile) Contents() {
