@@ -34,12 +34,12 @@ func (p* Processor) preRun() {
 }
 
 func (p* Processor) fetch() {
-  p.mem.In("in1") <- p.ip
-  bytes := <- p.mem.Out("out1")
+  p.mem.In(p, "in1") <- p.ip
+  bytes := <- p.mem.Out(p, "out1")
   fmt.Println(bytes)
 
-  p.cu.In("ins") <- bytes
-  p.ip = (<- p.cu.Out("ip")).(int)
+  p.cu.In(p.mem, "ins") <- bytes
+  p.ip = (<- p.cu.Out(p, "ip")).(int)
   if p.ip == -1 {
     // bail
     os.Exit(0)
@@ -69,7 +69,7 @@ func (p* Processor) Init(is* ins.InstructionSet, mem* comp.Memory) {
 
   p.cu = &exe.ControlUnit{}
   p.cu.Init()
-  p.ip = (<-p.cu.Out("ip")).(int)
+  p.ip = (<-p.cu.Out(p, "ip")).(int)
 }
 
 func (p* Processor) Debug(toggle bool) {

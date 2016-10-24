@@ -2,6 +2,7 @@ package comp
 
 import (
   "container/list"
+  "fmt"
 )
 
 var comps *list.List
@@ -40,10 +41,12 @@ func (c* Communicator) InitComms() {
   c.Outputs = make(map[string]chan interface{})
 }
 
-func (c* Communicator) In(in string) chan interface {} {
+func (c* Communicator) In(p interface{}, in string) chan interface {} {
+  fmt.Printf("%p \n", p)
   return c.Inputs[in]
 }
 
-func (c* Communicator) Out(out string) chan interface{} {
+func (c* Communicator) Out(p interface{}, out string) chan interface{} {
+  fmt.Printf("%p \n", p)
   return c.Outputs[out]
 }
