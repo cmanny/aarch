@@ -6,9 +6,25 @@ import (
 )
 
 type ControlUnit struct {
+  com* Communicator
+}
 
-  Data() interface{}
-  State() string
-  Cycle()
-  Communicator() *Communicator
+func (cu *ControlUnit) Init() {
+  cu.com = &Communicator{}
+}
+
+func (cu *ControlUnit) Data() interface{} {
+  return ""
+}
+
+func (cu *ControlUnit) State() string {
+  return ""
+}
+
+func (cu *ControlUnit) Cycle() {
+
+}
+
+func (cu *ControlUnit) Communicator() *Communicator {
+  return cu.com
 }

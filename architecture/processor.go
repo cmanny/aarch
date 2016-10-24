@@ -2,7 +2,7 @@ package architecture
 
 import (
   "fmt"
-  "github.com/cmanny/aarch/architecture/comp"
+//  "github.com/cmanny/aarch/architecture/comp"
 //  "github.com/cmanny/aarch/architecture/comp/exe"
   "github.com/cmanny/aarch/architecture/ins"
 )
@@ -14,7 +14,6 @@ type Processor struct {
 
   ip int
 
-  rf comp.RegisterFile
   is* ins.InstructionSet
 }
 
@@ -35,7 +34,7 @@ func (p* Processor) fetch() {
 }
 
 func (p* Processor) decode() {
-  
+
 }
 
 func (p* Processor) execute() {

@@ -14,22 +14,22 @@ type ArithmeticUnit struct {
   Communicator() *Communicator
 }
 
-func (au *ArithmeticUnit) Init() {
+func (au *Memory) Init() {
+  au.com = &Communicator{}
+}
+
+func (au *Memory) Data() interface{} {
+  return ""
+}
+
+func (au *Memory) State() string {
+  return ""
+}
+
+func (au *Memory) Cycle() {
 
 }
 
-func (au *ArithmeticUnit) Data() interface{} {
-
-}
-
-func (au *ArithmeticUnit) State() string {
-
-}
-
-func (au *ArithmeticUnit) Cycle() {
-
-}
-
-func (au *ArithmeticUnit) Communicator() *Communicator {
-
+func (au *Memory) Communicator() *Communicator {
+  return au.com
 }

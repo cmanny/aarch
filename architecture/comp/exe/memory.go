@@ -6,9 +6,25 @@ import (
 )
 
 type MemoryUnit struct {
+  com* Communicator
+}
 
-  Data() interface{}
-  State() string
-  Cycle()
-  Communicator() *Communicator
+func (mu *Memory) Init() {
+  mu.com = &Communicator{}
+}
+
+func (mu *Memory) Data() interface{} {
+  return ""
+}
+
+func (mu *Memory) State() string {
+  return ""
+}
+
+func (mu *Memory) Cycle() {
+
+}
+
+func (mu *Memory) Communicator() *Communicator {
+  return mu.com
 }
