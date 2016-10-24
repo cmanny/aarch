@@ -1,18 +1,19 @@
 package comp
 
 import (
-	"container/list"
 	"fmt"
 )
 
-var comps *list.List
+var Comps []Component
 
 func Init() {
-	comps = list.New()
+	Comps = make([]Component, 0)
 }
 
-func Add(c *Component) {
-	comps.PushBack(c)
+func AddAll(cs ...Component) {
+	for _, c := range cs {
+		Comps = append(Comps, c)
+	}
 }
 
 /* All components must satisfy the component functions */
