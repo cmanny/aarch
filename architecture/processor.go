@@ -5,7 +5,7 @@ import (
   "github.com/cmanny/aarch/architecture/comp"
   "github.com/cmanny/aarch/architecture/comp/exe"
   "github.com/cmanny/aarch/architecture/ins"
-  "bufio"
+  //"bufio"
   "os"
 )
 
@@ -34,14 +34,16 @@ func (p* Processor) preRun() {
 }
 
 func (p* Processor) fetch() {
-  fmt.Println("trying to fetch")
-  bufio.NewReader(os.Stdin).ReadString('\n')
-  p.mem.Communicator().Inputs["in1"] <- p.ip
-  bytes := <- p.mem.Communicator().Outputs["out1"]
+  p.mem.In("in1") <- p.ip
+  bytes := <- p.mem.Out("out1")
   fmt.Println(bytes)
 
-  p.cu.Communicator().Inputs["ins"] <- bytes
-  p.ip = (<- p.cu.Communicator().Outputs["ip"]).(int)
+  p.cu.In("ins") <- bytes
+  p.ip = (<- p.cu.Out("ip")).(int)
+  if p.ip == -1 {
+    // bail
+    os.Exit(0)
+  }
 
 
 }
@@ -67,7 +69,7 @@ func (p* Processor) Init(is* ins.InstructionSet, mem* comp.Memory) {
 
   p.cu = &exe.ControlUnit{}
   p.cu.Init()
-  p.ip = (<-p.cu.Communicator().Outputs["ip"]).(int)
+  p.ip = (<-p.cu.Out("ip")).(int)
 }
 
 func (p* Processor) Debug(toggle bool) {

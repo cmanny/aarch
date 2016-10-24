@@ -19,6 +19,5 @@
   subi c c 1
   cmpi d c 0
   jne .complex d
-  jmp 0
 
 .data

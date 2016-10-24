@@ -6,12 +6,11 @@ import (
 )
 
 type ArithmeticUnit struct {
-  com* comp.Communicator
+  comp.Communicator
 }
 
 func (au *ArithmeticUnit) Init() {
-  au.com = &comp.Communicator{}
-  au.com.Init()
+  au.InitComms()
 }
 
 func (au *ArithmeticUnit) Data() interface{} {
@@ -24,8 +23,4 @@ func (au *ArithmeticUnit) State() string {
 
 func (au *ArithmeticUnit) Cycle() {
 
-}
-
-func (au *ArithmeticUnit) Communicator() * comp.Communicator {
-  return au.com
 }

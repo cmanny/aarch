@@ -6,14 +6,13 @@ import (
 )
 
 type RegisterFile struct {
+  Communicator
   regs [32] int
   Flags int
-
-  com* Communicator
 }
 
 func (rf *RegisterFile) Init() {
-  rf.com = &Communicator{}
+  rf.InitComms()
 }
 
 func (rf *RegisterFile) Data() interface{} {

@@ -6,12 +6,11 @@ import (
 )
 
 type LogicUnit struct {
-  com* comp.Communicator
+  comp.Communicator
 }
 
 func (lu *LogicUnit) Init() {
-  lu.com = &comp.Communicator{}
-  lu.com.Init()
+  lu.InitComms()
 }
 
 func (lu *LogicUnit) Data() interface{} {
@@ -24,8 +23,4 @@ func (lu *LogicUnit) State() string {
 
 func (lu *LogicUnit) Cycle() {
 
-}
-
-func (lu *LogicUnit) Communicator() *comp.Communicator {
-  return lu.com
 }

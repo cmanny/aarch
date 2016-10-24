@@ -6,12 +6,11 @@ import (
 )
 
 type MemoryUnit struct {
-  com* comp.Communicator
+  comp.Communicator
 }
 
 func (mu *MemoryUnit) Init() {
-  mu.com = &comp.Communicator{}
-  mu.com.Init()
+  mu.InitComms()
 }
 
 func (mu *MemoryUnit) Data() interface{} {
@@ -24,8 +23,4 @@ func (mu *MemoryUnit) State() string {
 
 func (mu *MemoryUnit) Cycle() {
 
-}
-
-func (mu *MemoryUnit) Communicator() *comp.Communicator {
-  return mu.com
 }
