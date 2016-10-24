@@ -22,6 +22,9 @@ type Processor struct {
 }
 
 
+
+
+
 /**
   Private methods of Processor
 **/
@@ -70,6 +73,18 @@ func (p* Processor) Init(is* ins.InstructionSet, mem* comp.Memory) {
   p.cu = &exe.ControlUnit{}
   p.cu.Init()
   p.ip = (<-p.cu.Out(p, "ip")).(int)
+}
+
+func (p* Processor) Data() interface{}{
+  return 1
+}
+
+func (p* Processor) State() string {
+  return ""
+}
+
+func (p* Processor) Cycle() {
+
 }
 
 func (p* Processor) Debug(toggle bool) {

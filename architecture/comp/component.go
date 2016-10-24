@@ -17,7 +17,6 @@ func Add(c* Component) {
 
 /* All components must satisfy the component functions */
 type Component interface {
-  Init()
   Data() interface{}
   State() string
   Cycle() /* advance one cycle */
@@ -41,12 +40,12 @@ func (c* Communicator) InitComms() {
   c.Outputs = make(map[string]chan interface{})
 }
 
-func (c* Communicator) In(p interface{}, in string) chan interface {} {
-  fmt.Printf("%p \n", p)
+func (c* Communicator) In(ct Component, in string) chan interface {} {
+  fmt.Printf("%p \n", ct)
   return c.Inputs[in]
 }
 
-func (c* Communicator) Out(p interface{}, out string) chan interface{} {
-  fmt.Printf("%p \n", p)
+func (c* Communicator) Out(ct Component, out string) chan interface{} {
+  fmt.Printf("%p \n", ct)
   return c.Outputs[out]
 }
