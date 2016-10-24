@@ -2,12 +2,23 @@
   movi a 0
   movi b 1
   movi c 10
-.loopstart
+  jmp .simple
+.simple
   mov  d b
   add  b b a
-  mov  a a
-  subi c 1
-  jne  .loopstart c
+  mov  a d
+  subi c c 1
+  cmpi d c 0
+  jne .simple d
+  halt
+.complex
+  xor  a a b
+  xor  b a b
+  xor  a a b
+  add  b a b
+  subi c c 1
+  cmpi d c 0
+  jne .complex d
   halt
 
 .data

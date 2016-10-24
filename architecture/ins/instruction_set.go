@@ -47,6 +47,7 @@ const (
 	INS_ADDI
 	INS_SUBI
 	INS_MULI
+  INS_XORI
 
 
 	INS_LEAL
@@ -62,17 +63,21 @@ const (
     make better guesses at which data to load into the cache and pipeline
 **/
 
+  INS_JMP
 	INS_JEQ
 	INS_JNE
 	INS_JL
 	INS_JGE
+  INS_JRND
 
+  INS_AJMP
   INS_AJEQ
   INS_AJNE
   INS_AJL
   INS_AJGE
 
 	INS_CMP
+  INS_CMPI
 )
 
 const (
@@ -114,21 +119,21 @@ func (is* InstructionSet) InsStrDecode(ins string) (byte, error ){
   if val, ok := is.ins_str[ins]; ok {
     return val, nil
   }
-  return 255, fmt.Errorf("could not find instruction string in mapping")
+  return 255, fmt.Errorf("could not find instruction string in mapping (%s)", ins)
 }
 
 func (is* InstructionSet) InsIdDecode(id byte) (InsInfo, error) {
   if val, ok := is.ins_map[id]; ok {
     return val, nil
   }
-  return InsInfo{-1, -1, -1, -1}, fmt.Errorf("could not find instruction id in mapping")
+  return InsInfo{-1, -1, -1, -1}, fmt.Errorf("could not find instruction id in mapping (%d)", id)
 }
 
 func (is* InstructionSet) RegStrDecode(reg string) (byte, error) {
   if val, ok := is.reg_str[reg]; ok {
     return val, nil
   }
-  return 255, fmt.Errorf("could not find reg str in mapping")
+  return 255, fmt.Errorf("could not find reg str in mapping (%s)", reg)
 }
 
 func (is* InstructionSet) strMapsInit() {
@@ -141,6 +146,7 @@ func (is* InstructionSet) strMapsInit() {
   is.ins_str["addi"] = INS_ADDI
   is.ins_str["subi"] = INS_SUBI
   is.ins_str["muli"] = INS_MULI
+  is.ins_str["xori"] = INS_XORI
 
   is.ins_str["leal"] = INS_LEAL
   is.ins_str["leah"] = INS_LEAH
@@ -151,17 +157,21 @@ func (is* InstructionSet) strMapsInit() {
   is.ins_str["ldr"] = INS_LDR
   is.ins_str["str"] = INS_STR
 
+  is.ins_str["jmp"] = INS_JMP
   is.ins_str["jeq"] = INS_JEQ
   is.ins_str["jne"] = INS_JNE
   is.ins_str["jl"] = INS_JL
   is.ins_str["jge"] = INS_JGE
+  is.ins_str["jrnd"] = INS_JRND
 
+  is.ins_str["ajmp"] = INS_AJMP
   is.ins_str["ajeq"] = INS_AJEQ
   is.ins_str["ajne"] = INS_AJNE
   is.ins_str["ajl"] = INS_AJL
   is.ins_str["ajge"] = INS_AJGE
 
   is.ins_str["cmp"] = INS_CMP
+  is.ins_str["cmpi"] = INS_CMPI
   is.ins_str["halt"] = INS_HALT
 
   /* Reg maps */
@@ -182,10 +192,13 @@ func (is* InstructionSet) insMapInit() {
 	is.ins_map[INS_ADD] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
 	is.ins_map[INS_SUB] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
 	is.ins_map[INS_MUL] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
+  is.ins_map[INS_XOR] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
 
-	is.ins_map[INS_ADDI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
-	is.ins_map[INS_SUBI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
-	is.ins_map[INS_MULI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
+  is.ins_map[INS_ADDI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
+	is.ins_map[INS_SUBI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
+	is.ins_map[INS_MULI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
+  is.ins_map[INS_XORI] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
+
 
 	is.ins_map[INS_LEAL] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_CONSTANT_8}
 	is.ins_map[INS_LEAH] = InsInfo{INS_TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_CONSTANT_8}
@@ -199,11 +212,14 @@ func (is* InstructionSet) insMapInit() {
 
 	/* Control flow */
 
+	is.ins_map[INS_JMP] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_EMPTY, OP_EMPTY}
 	is.ins_map[INS_JEQ] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
 	is.ins_map[INS_JNE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
 	is.ins_map[INS_JL] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
 	is.ins_map[INS_JGE] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
+  is.ins_map[INS_JRND] = InsInfo{INS_TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
 
+	is.ins_map[INS_AJMP] = InsInfo{INS_TYPE_CONTROL, OP_REGISTER, OP_EMPTY, OP_EMPTY}
   is.ins_map[INS_AJEQ] = InsInfo{INS_TYPE_CONTROL, OP_REGISTER, OP_REGISTER, OP_EMPTY}
 	is.ins_map[INS_AJNE] = InsInfo{INS_TYPE_CONTROL, OP_REGISTER, OP_REGISTER, OP_EMPTY}
 	is.ins_map[INS_AJL] = InsInfo{INS_TYPE_CONTROL, OP_REGISTER, OP_REGISTER, OP_EMPTY}
@@ -215,6 +231,8 @@ func (is* InstructionSet) insMapInit() {
 	/* Logical */
 
 	is.ins_map[INS_CMP] = InsInfo{INS_TYPE_LOGIC, OP_REGISTER, OP_REGISTER, OP_REGISTER}
+
+  is.ins_map[INS_CMPI] = InsInfo{INS_TYPE_LOGIC, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
 
 
 }

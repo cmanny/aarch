@@ -67,7 +67,7 @@ func main() {
   p.Debug(true)
   p.Run()
   if *runWebPtr {
-    fmt.Println("Runnign web")
+    fmt.Println("Runnin' web")
     serv.Run()
   }
 }

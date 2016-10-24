@@ -35,7 +35,7 @@ func (p* Processor) fetch() {
 }
 
 func (p* Processor) decode() {
-
+  
 }
 
 func (p* Processor) execute() {
