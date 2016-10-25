@@ -1,46 +1,46 @@
 package exe
 
 import (
-  "github.com/cmanny/aarch/architecture/ins"
-  "github.com/cmanny/aarch/architecture/comp"
+	"github.com/cmanny/aarch/architecture/comp"
+	"github.com/cmanny/aarch/architecture/ins"
 )
 
 type ControlUnit struct {
-  comp.Communicator
+	comp.Communicator
 
-  ip int
+	ip int
 }
 
 func (cu *ControlUnit) Init() {
-  cu.InitComms()
+	cu.InitComms()
 
-  cu.ip = 0
+	cu.ip = 0
 
-  cu.Inputs["ins"] = make(chan interface{}, 1)
-  cu.Outputs["ip"] = make(chan interface{}, 1)
+	cu.Inputs["ins"] = make(chan interface{}, 1)
+	cu.Outputs["ip"] = make(chan interface{}, 1)
 
-  cu.Outputs["ip"] <- cu.ip
+	cu.Outputs["ip"] <- cu.ip
 }
 
 func (cu *ControlUnit) Data() interface{} {
-  return ""
+	return ""
 }
 
 func (cu *ControlUnit) State() string {
-  return ""
+	return ""
 }
 
 func (cu *ControlUnit) Cycle() {
-  bytes := (<-cu.Inputs["ins"]).([]byte)
+	bytes := (<-cu.Inputs["ins"]).([]byte)
 
-  switch bytes[0] {
-    case ins.INS_JMP:
-      cu.ip += 4 * int(bytes[1])
-    case ins.INS_HALT:
-      cu.ip = -1
-    default:
-      cu.ip += 4
-  }
+	switch bytes[0] {
+	case ins.JMP:
+		cu.ip += 4 * int(bytes[1])
+	case ins.HALT:
+		cu.ip = -1
+	default:
+		cu.ip += 4
+	}
 
-  cu.Outputs["ip"] <- cu.ip
+	cu.Outputs["ip"] <- cu.ip
 }
