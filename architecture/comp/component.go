@@ -4,13 +4,13 @@ import (
 	"fmt"
 )
 
-var Comps []Component
+var Comps []*CompWrapper
 
 func Init() {
-	Comps = make([]Component, 0)
+	Comps = make([]*CompWrapper, 0)
 }
 
-func AddAll(cs ...Component) {
+func AddAll(cs ...*CompWrapper) {
 	for _, c := range cs {
 		Comps = append(Comps, c)
 	}
@@ -23,17 +23,23 @@ type Component interface {
 	Cycle() /* advance one cycle */
 }
 
-/* All components need communicators */
-
-func NewCommunicator() *Communicator {
-	c := &Communicator{}
-	c.InitComms()
-	return c
+type CompWrapper struct {
+	Name string
+	Obj  Component
 }
 
+type NullComponent struct{}
+
+func (n *NullComponent) Data() interface{} { return 0 }
+func (n *NullComponent) State() string     { return "" }
+func (n *NullComponent) Cycle()            {}
+
+/* All components need communicators */
+
 type Communicator struct {
-	Inputs  map[string]chan interface{}
-	Outputs map[string]chan interface{}
+	Inputs    map[string]chan interface{}
+	Outputs   map[string]chan interface{}
+	MustCycle bool
 }
 
 func (c *Communicator) InitComms() {
@@ -42,7 +48,9 @@ func (c *Communicator) InitComms() {
 }
 
 func (c *Communicator) In(ct Component, in string) chan interface{} {
+	c.MustCycle = true
 	fmt.Printf("%p \n", &ct)
+
 	return c.Inputs[in]
 }
 

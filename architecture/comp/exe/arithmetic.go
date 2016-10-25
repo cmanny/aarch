@@ -5,14 +5,9 @@ import (
 	"github.com/cmanny/aarch/architecture/ins"
 )
 
-type AuIn struct {
-	code byte
-	op1  int
-	op2  int
-}
-
 type ArithmeticUnit struct {
 	comp.Communicator
+	currentIns InsIn
 }
 
 func (au *ArithmeticUnit) Init() {
@@ -28,17 +23,17 @@ func (au *ArithmeticUnit) State() string {
 }
 
 func (au *ArithmeticUnit) Cycle() {
-	op := (<-au.Inputs["in"]).(AuIn)
+	in := (<-au.Inputs["in"]).(InsIn)
 	res := 0
 	switch {
-	case op.code == ins.MUL || op.code == ins.MULI:
-		res = op.op1 * op.op2
-	case op.code == ins.ADD || op.code == ins.ADDI:
-		res = op.op1 + op.op2
-	case op.code == ins.SUB || op.code == ins.SUBI:
-		res = op.op1 - op.op2
-	case op.code == ins.XOR || op.code == ins.XORI:
-		res = op.op1 ^ op.op2
+	case in.Code == ins.MUL || in.Code == ins.MULI:
+		res = in.Op2 * in.Op3
+	case in.Code == ins.ADD || in.Code == ins.ADDI:
+		res = in.Op2 + in.Op3
+	case in.Code == ins.SUB || in.Code == ins.SUBI:
+		res = in.Op2 - in.Op3
+	case in.Code == ins.XOR || in.Code == ins.XORI:
+		res = in.Op2 ^ in.Op3
 	}
 
 	au.Outputs["out"] <- res

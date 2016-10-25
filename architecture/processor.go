@@ -17,9 +17,20 @@ type Processor struct {
 
 	ip int
 
-	is  *ins.InstructionSet
+	is *ins.InstructionSet
+
+	/* Components */
+
 	mem *comp.Memory
-	cu  *exe.ControlUnit
+
+	fu *comp.NullComponent
+	du *comp.NullComponent
+
+	cu *exe.ControlUnit
+	au *exe.ArithmeticUnit
+	lu *exe.LogicUnit
+
+	rf *comp.RegisterFile
 }
 
 /**
@@ -64,13 +75,50 @@ func (p *Processor) writeback() {
 func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory) {
 	comp.Init()
 	p.is = is
+
+	/* Init all sub components */
 	p.mem = mem
+
+	p.fu = &comp.NullComponent{}
+	p.du = &comp.NullComponent{}
 
 	p.cu = &exe.ControlUnit{}
 	p.cu.Init()
+
+	p.au = &exe.ArithmeticUnit{}
+	p.au.Init()
+
+	p.lu = &exe.LogicUnit{}
+	p.lu.Init()
+
 	p.ip = (<-p.cu.Out(p, "ip")).(int)
 
-	comp.AddAll(p.mem, p.cu)
+	comp.AddAll(
+		&comp.CompWrapper{
+			Name: "RAM",
+			Obj:  p.mem,
+		},
+		&comp.CompWrapper{
+			Name: "Fetch",
+			Obj:  p.fu,
+		},
+		&comp.CompWrapper{
+			Name: "Decode",
+			Obj:  p.du,
+		},
+		&comp.CompWrapper{
+			Name: "ControlUnit",
+			Obj:  p.cu,
+		},
+		&comp.CompWrapper{
+			Name: "ArithmeticUnit",
+			Obj:  p.au,
+		},
+		&comp.CompWrapper{
+			Name: "LogicUnit",
+			Obj:  p.lu,
+		},
+	)
 }
 
 func (p *Processor) Data() interface{} {
@@ -99,7 +147,7 @@ func (p *Processor) Run() {
 
 	for {
 		for _, c := range comp.Comps {
-			go c.Cycle()
+			go c.Obj.Cycle()
 		}
 		p.fetch()
 		p.decode()
