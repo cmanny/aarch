@@ -37,6 +37,10 @@ func (au *ArithmeticUnit) Cycle() {
 				res = in.Op2 - in.Op3
 			case in.Code == ins.XOR || in.Code == ins.XORI:
 				res = in.Op2 ^ in.Op3
+			case in.Code == ins.LEAL:
+				res = res | (in.Op2<<8|in.Op3)<<0
+			case in.Code == ins.LEAH:
+				res = res | (in.Op2<<8|in.Op3)<<16
 			}
 			au.Outputs["out"] <- res
 		default:
