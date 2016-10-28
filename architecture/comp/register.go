@@ -14,8 +14,11 @@ type RegisterFile struct {
 func (rf *RegisterFile) Init() {
 	rf.InitComms()
 
-	rf.Inputs["in1"] = make(chan interface{}, 1)
-	rf.Outputs["out1"] = make(chan interface{}, 1)
+	rf.Inputs["inr"] = make(chan interface{}, 1)
+	rf.Outputs["outr"] = make(chan interface{}, 1)
+
+	rf.Inputs["w1"] = make(chan interface{}, 1)
+	rf.Outputs["w2"] = make(chan interface{}, 1)
 }
 
 func (rf *RegisterFile) Data() interface{} {
@@ -27,7 +30,7 @@ func (rf *RegisterFile) State() string {
 }
 
 func (rf *RegisterFile) Cycle() {
-	rf.Outputs["out1"] <- rf.regs[(<-rf.Inputs["in1"]).(int)]
+
 }
 
 func (rf *RegisterFile) Contents() {

@@ -43,7 +43,7 @@ func (p *Processor) preRun() {
 	}
 }
 
-func (p *Processor) fetch() {
+func (p *Processor) fetch() []byte {
 	p.mem.In(p, "in1") <- p.ip
 	bytes := <-p.mem.Out(p, "out1")
 	fmt.Println(bytes)
@@ -54,17 +54,21 @@ func (p *Processor) fetch() {
 		// bail
 		p.exit = true
 	}
-
+	return bytes.([]byte)
 }
 
-func (p *Processor) decode() {
-
+func (p *Processor) decode(bytes []byte) *exe.InsIn {
+	if bytes == nil {
+		return nil
+	}
+	insIn := &exe.InsIn{}
+	return insIn
 }
 
-func (p *Processor) execute() {
-}
-
-func (p *Processor) writeback() {
+func (p *Processor) execute(in *exe.InsIn) {
+	if in == nil {
+		return
+	}
 
 }
 
@@ -149,10 +153,7 @@ func (p *Processor) Run() {
 		for _, c := range comp.Comps {
 			go c.Obj.Cycle()
 		}
-		p.fetch()
-		p.decode()
-		p.execute()
-		p.writeback()
+		p.execute(p.decode(p.fetch()))
 
 		if p.exit {
 			return
