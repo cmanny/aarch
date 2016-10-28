@@ -34,6 +34,9 @@ const (
 	/* Register identifier */
 	OP_REGISTER
 
+	/* Indirect address identifier */
+	OP_IND_ADDR
+
 	/* Constant value */
 	OP_CONSTANT_8
 )
@@ -211,8 +214,8 @@ func (is *InstructionSet) insMapInit() {
 	is.ins_map[MOV] = InsInfo{TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
 	is.ins_map[MOVI] = InsInfo{TYPE_MOVE, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
 
-	is.ins_map[LDR] = InsInfo{TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
-	is.ins_map[STR] = InsInfo{TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
+	is.ins_map[LDR] = InsInfo{TYPE_MOVE, OP_REGISTER, OP_IND_ADDR, OP_EMPTY}
+	is.ins_map[STR] = InsInfo{TYPE_MOVE, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
 
 	/* Control flow */
 
@@ -223,11 +226,11 @@ func (is *InstructionSet) insMapInit() {
 	is.ins_map[JGE] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
 	is.ins_map[JRND] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
 
-	is.ins_map[AJMP] = InsInfo{TYPE_CONTROL, OP_REGISTER, OP_EMPTY, OP_EMPTY}
-	is.ins_map[AJEQ] = InsInfo{TYPE_CONTROL, OP_REGISTER, OP_REGISTER, OP_EMPTY}
-	is.ins_map[AJNE] = InsInfo{TYPE_CONTROL, OP_REGISTER, OP_REGISTER, OP_EMPTY}
-	is.ins_map[AJL] = InsInfo{TYPE_CONTROL, OP_REGISTER, OP_REGISTER, OP_EMPTY}
-	is.ins_map[AJGE] = InsInfo{TYPE_CONTROL, OP_REGISTER, OP_REGISTER, OP_EMPTY}
+	is.ins_map[AJMP] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_EMPTY, OP_EMPTY}
+	is.ins_map[AJEQ] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
+	is.ins_map[AJNE] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
+	is.ins_map[AJL] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
+	is.ins_map[AJGE] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
 
 	is.ins_map[HALT] = InsInfo{TYPE_CONTROL, OP_EMPTY, OP_EMPTY, OP_EMPTY}
 

@@ -152,6 +152,7 @@ func (p *Processor) Run() {
 		p.fetch()
 		p.decode()
 		p.execute()
+		p.writeback()
 
 		if p.exit {
 			return
