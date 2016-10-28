@@ -23,19 +23,24 @@ func (au *ArithmeticUnit) State() string {
 }
 
 func (au *ArithmeticUnit) Cycle() {
-	in := (<-au.Inputs["in"]).(InsIn)
 	res := 0
-	switch {
-	case in.Code == ins.MUL || in.Code == ins.MULI:
-		res = in.Op2 * in.Op3
-	case in.Code == ins.ADD || in.Code == ins.ADDI:
-		res = in.Op2 + in.Op3
-	case in.Code == ins.SUB || in.Code == ins.SUBI:
-		res = in.Op2 - in.Op3
-	case in.Code == ins.XOR || in.Code == ins.XORI:
-		res = in.Op2 ^ in.Op3
+	for {
+		select {
+		case _in := <-au.Inputs["in"]:
+			in := _in.(InsIn)
+			switch {
+			case in.Code == ins.MUL || in.Code == ins.MULI:
+				res = in.Op2 * in.Op3
+			case in.Code == ins.ADD || in.Code == ins.ADDI:
+				res = in.Op2 + in.Op3
+			case in.Code == ins.SUB || in.Code == ins.SUBI:
+				res = in.Op2 - in.Op3
+			case in.Code == ins.XOR || in.Code == ins.XORI:
+				res = in.Op2 ^ in.Op3
+			}
+			au.Outputs["out"] <- res
+		default:
+		}
 	}
-
-	au.Outputs["out"] <- res
 
 }

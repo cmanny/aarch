@@ -7,13 +7,13 @@ import (
 	"github.com/cmanny/aarch/architecture/comp/exe"
 	"github.com/cmanny/aarch/architecture/ins"
 	//"bufio"
-	"os"
 )
 
 type Processor struct {
 	clockSpeed int
 	numExUnits int
 	printDebug bool
+	exit       bool
 
 	ip int
 
@@ -52,7 +52,7 @@ func (p *Processor) fetch() {
 	p.ip = (<-p.cu.Out(p, "ip")).(int)
 	if p.ip == -1 {
 		// bail
-		os.Exit(0)
+		p.exit = true
 	}
 
 }
@@ -152,5 +152,9 @@ func (p *Processor) Run() {
 		p.fetch()
 		p.decode()
 		p.execute()
+
+		if p.exit {
+			return
+		}
 	}
 }

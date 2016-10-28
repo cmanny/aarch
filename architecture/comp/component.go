@@ -24,8 +24,11 @@ type Component interface {
 }
 
 type CompWrapper struct {
-	Name string
-	Obj  Component
+	Name  string
+	Obj   Component
+	Shape string
+	Size  int
+	Color string
 }
 
 type NullComponent struct{}
@@ -37,9 +40,8 @@ func (n *NullComponent) Cycle()            {}
 /* All components need communicators */
 
 type Communicator struct {
-	Inputs    map[string]chan interface{}
-	Outputs   map[string]chan interface{}
-	MustCycle bool
+	Inputs  map[string]chan interface{}
+	Outputs map[string]chan interface{}
 }
 
 func (c *Communicator) InitComms() {
@@ -48,7 +50,6 @@ func (c *Communicator) InitComms() {
 }
 
 func (c *Communicator) In(ct Component, in string) chan interface{} {
-	c.MustCycle = true
 	fmt.Printf("%p \n", &ct)
 
 	return c.Inputs[in]
