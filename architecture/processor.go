@@ -1,36 +1,36 @@
 package architecture
 
 import (
-	"fmt"
+  "fmt"
 
-	"github.com/cmanny/aarch/architecture/comp"
-	"github.com/cmanny/aarch/architecture/comp/exe"
-	"github.com/cmanny/aarch/architecture/ins"
-	//"bufio"
+  "github.com/cmanny/aarch/architecture/comp"
+  "github.com/cmanny/aarch/architecture/comp/exe"
+  "github.com/cmanny/aarch/architecture/ins"
+  //"bufio"
 )
 
 type Processor struct {
-	clockSpeed int
-	numExUnits int
-	printDebug bool
-	exit       bool
+  clockSpeed int
+  numExUnits int
+  printDebug bool
+  exit       bool
 
-	ip int
+  ip int
 
-	is *ins.InstructionSet
+  is *ins.InstructionSet
 
-	/* Components */
+  /* Components */
 
-	mem *comp.Memory
+  mem *comp.Memory
 
-	fu *comp.NullComponent
-	du *comp.NullComponent
+  fu *comp.NullComponent
+  du *comp.NullComponent
 
-	cu *exe.ControlUnit
-	au *exe.ArithmeticUnit
-	lu *exe.LogicUnit
+  cu *exe.ControlUnit
+  au *exe.ArithmeticUnit
+  lu *exe.LogicUnit
 
-	rf *comp.RegisterFile
+  rf *comp.RegisterFile
 }
 
 /**
@@ -38,37 +38,37 @@ type Processor struct {
 **/
 
 func (p *Processor) preRun() {
-	if p.printDebug {
-		fmt.Println("Debug ON")
-	}
+  if p.printDebug {
+    fmt.Println("Debug ON")
+  }
 }
 
 func (p *Processor) fetch() []byte {
-	p.mem.In(p, "in1") <- p.ip
-	bytes := <-p.mem.Out(p, "out1")
-	fmt.Println(bytes)
+  p.mem.In(p, "in1") <- p.ip
+  bytes := <-p.mem.Out(p, "out1")
+  fmt.Println(bytes)
 
-	p.cu.In(p.mem, "ins") <- bytes
-	p.ip = (<-p.cu.Out(p, "ip")).(int)
-	if p.ip == -1 {
-		// bail
-		p.exit = true
-	}
-	return bytes.([]byte)
+  p.cu.In(p.mem, "ins") <- bytes
+  p.ip = (<-p.cu.Out(p, "ip")).(int)
+  if p.ip == -1 {
+    // bail
+    p.exit = true
+  }
+  return bytes.([]byte)
 }
 
 func (p *Processor) decode(bytes []byte) *exe.InsIn {
-	if bytes == nil {
-		return nil
-	}
-	insIn := &exe.InsIn{}
-	return insIn
+  if bytes == nil {
+    return nil
+  }
+  insIn := &exe.InsIn{}
+  return insIn
 }
 
 func (p *Processor) execute(in *exe.InsIn) {
-	if in == nil {
-		return
-	}
+  if in == nil {
+    return
+  }
 
 }
 
@@ -77,60 +77,60 @@ func (p *Processor) execute(in *exe.InsIn) {
 **/
 
 func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory) {
-	comp.Init()
-	p.is = is
+  comp.Init()
+  p.is = is
 
-	/* Init all sub components */
-	p.mem = mem
+  /* Init all sub components */
+  p.mem = mem
 
-	p.fu = &comp.NullComponent{}
-	p.du = &comp.NullComponent{}
+  p.fu = &comp.NullComponent{}
+  p.du = &comp.NullComponent{}
 
-	p.cu = &exe.ControlUnit{}
-	p.cu.Init()
+  p.cu = &exe.ControlUnit{}
+  p.cu.Init()
 
-	p.au = &exe.ArithmeticUnit{}
-	p.au.Init()
+  p.au = &exe.ArithmeticUnit{}
+  p.au.Init()
 
-	p.lu = &exe.LogicUnit{}
-	p.lu.Init()
+  p.lu = &exe.LogicUnit{}
+  p.lu.Init()
 
-	p.ip = (<-p.cu.Out(p, "ip")).(int)
+  p.ip = (<-p.cu.Out(p, "ip")).(int)
 
-	comp.AddAll(
-		&comp.CompWrapper{
-			Name: "RAM",
-			Obj:  p.mem,
-		},
-		&comp.CompWrapper{
-			Name: "Fetch",
-			Obj:  p.fu,
-		},
-		&comp.CompWrapper{
-			Name: "Decode",
-			Obj:  p.du,
-		},
-		&comp.CompWrapper{
-			Name: "ControlUnit",
-			Obj:  p.cu,
-		},
-		&comp.CompWrapper{
-			Name: "ArithmeticUnit",
-			Obj:  p.au,
-		},
-		&comp.CompWrapper{
-			Name: "LogicUnit",
-			Obj:  p.lu,
-		},
-	)
+  comp.AddAll(
+    &comp.CompWrapper{
+      Name: "RAM",
+      Obj:  p.mem,
+    },
+    &comp.CompWrapper{
+      Name: "Fetch",
+      Obj:  p.fu,
+    },
+    &comp.CompWrapper{
+      Name: "Decode",
+      Obj:  p.du,
+    },
+    &comp.CompWrapper{
+      Name: "ControlUnit",
+      Obj:  p.cu,
+    },
+    &comp.CompWrapper{
+      Name: "ArithmeticUnit",
+      Obj:  p.au,
+    },
+    &comp.CompWrapper{
+      Name: "LogicUnit",
+      Obj:  p.lu,
+    },
+  )
 }
 
 func (p *Processor) Data() interface{} {
-	return 1
+  return 1
 }
 
 func (p *Processor) State() string {
-	return ""
+  return ""
 }
 
 func (p *Processor) Cycle() {
@@ -138,25 +138,25 @@ func (p *Processor) Cycle() {
 }
 
 func (p *Processor) Debug(toggle bool) {
-	p.printDebug = toggle
+  p.printDebug = toggle
 }
 
 func (p *Processor) SetIP(ip int) {
-	p.ip = ip
+  p.ip = ip
 }
 
 func (p *Processor) Run() {
-	p.preRun()
-	fmt.Println("Processor beginning")
+  p.preRun()
+  fmt.Println("Processor beginning")
 
-	for {
-		for _, c := range comp.Comps {
-			go c.Obj.Cycle()
-		}
-		p.execute(p.decode(p.fetch()))
+  for {
+    for _, c := range comp.Comps {
+      go c.Obj.Cycle()
+    }
+    p.execute(p.decode(p.fetch()))
 
-		if p.exit {
-			return
-		}
-	}
+    if p.exit {
+      return
+    }
+  }
 }

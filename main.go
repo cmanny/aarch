@@ -1,15 +1,15 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
+  "flag"
+  "fmt"
+  "log"
 
-	"github.com/cmanny/aarch/architecture"
-	"github.com/cmanny/aarch/architecture/comp"
-	"github.com/cmanny/aarch/architecture/ins"
+  "github.com/cmanny/aarch/architecture"
+  "github.com/cmanny/aarch/architecture/comp"
+  "github.com/cmanny/aarch/architecture/ins"
 
-	"github.com/cmanny/aarch/web"
+  "github.com/cmanny/aarch/web"
 )
 
 /**
@@ -25,46 +25,46 @@ import (
 
 func main() {
 
-	fileNamePtr := flag.String("prog", "fib.gp", "file to assemble and run")
-	runWebPtr := flag.Bool("web", true, "bool to run web front end")
+  fileNamePtr := flag.String("prog", "fib.gp", "file to assemble and run")
+  runWebPtr := flag.Bool("web", true, "bool to run web front end")
 
-	flag.Parse()
+  flag.Parse()
 
-	/* Init top level components */
+  /* Init top level components */
 
-	/* Architectural components */
-	is := &ins.InstructionSet{}
-	is.Init()
-	mem := &comp.Memory{}
-	mem.Init()
-	p := &architecture.Processor{}
-	p.Init(is, mem)
-	as := &ins.Assembler{}
-	as.Init(is)
+  /* Architectural components */
+  is := &ins.InstructionSet{}
+  is.Init()
+  mem := &comp.Memory{}
+  mem.Init()
+  p := &architecture.Processor{}
+  p.Init(is, mem)
+  as := &ins.Assembler{}
+  as.Init(is)
 
-	/* Visualisation components */
+  /* Visualisation components */
 
-	serv := &server.Server{}
-	serv.Init("8080   ")
+  serv := &server.Server{}
+  serv.Init("8080   ")
 
-	/* Begin */
+  /* Begin */
 
-	bytes, err := as.AssembleFile(*fileNamePtr)
-	fmt.Println(bytes)
+  bytes, err := as.AssembleFile(*fileNamePtr)
+  fmt.Println(bytes)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+  if err != nil {
+    log.Fatal(err)
+  }
 
-	/* Fill memory with compilde bytes */
+  /* Fill memory with compilde bytes */
 
-	mem.Fill(bytes, 0)
-	p.SetIP(0)
+  mem.Fill(bytes, 0)
+  p.SetIP(0)
 
-	p.Debug(true)
-	p.Run()
-	if *runWebPtr {
-		fmt.Println("Runnin' web")
-		serv.Run()
-	}
+  p.Debug(true)
+  p.Run()
+  if *runWebPtr {
+    fmt.Println("Runnin' web")
+    serv.Run()
+  }
 }

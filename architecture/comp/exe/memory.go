@@ -4,19 +4,19 @@ package exe
 import "github.com/cmanny/aarch/architecture/comp"
 
 type MemoryUnit struct {
-	comp.Communicator
+  comp.Communicator
 }
 
 func (mu *MemoryUnit) Init() {
-	mu.InitComms()
+  mu.InitComms()
 }
 
 func (mu *MemoryUnit) Data() interface{} {
-	return ""
+  return ""
 }
 
 func (mu *MemoryUnit) State() string {
-	return ""
+  return ""
 }
 
 func (mu *MemoryUnit) Cycle() {

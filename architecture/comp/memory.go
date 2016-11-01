@@ -2,9 +2,8 @@ package comp
 
 type Memory struct {
   Communicator
-  bytes [4096] byte
+  bytes [4096]byte
 }
-
 
 func (mu *Memory) Init() {
   mu.InitComms()
@@ -22,11 +21,11 @@ func (mu *Memory) State() string {
 
 func (mu *Memory) Cycle() {
   index := (<-mu.Inputs["in1"]).(int)
-  mu.Outputs["out1"] <- mu.bytes[index: index + 4]
+  mu.Outputs["out1"] <- mu.bytes[index : index+4]
 }
 
-func (m* Memory) Fill(bytes []byte, index int) {
+func (m *Memory) Fill(bytes []byte, index int) {
   for i := 0; i < len(bytes); i++ {
-    m.bytes[i + index] = bytes[i]
+    m.bytes[i+index] = bytes[i]
   }
 }

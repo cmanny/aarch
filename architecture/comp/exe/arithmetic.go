@@ -1,41 +1,41 @@
 package exe
 
 import (
-	"github.com/cmanny/aarch/architecture/comp"
-	"github.com/cmanny/aarch/architecture/ins"
+  "github.com/cmanny/aarch/architecture/comp"
+  "github.com/cmanny/aarch/architecture/ins"
 )
 
 type ArithmeticUnit struct {
-	comp.Communicator
-	currentIns InsIn
+  comp.Communicator
+  currentIns InsIn
 }
 
 func (au *ArithmeticUnit) Init() {
-	au.InitComms()
+  au.InitComms()
 }
 
 func (au *ArithmeticUnit) Data() interface{} {
-	return ""
+  return ""
 }
 
 func (au *ArithmeticUnit) State() string {
-	return ""
+  return ""
 }
 
 func (au *ArithmeticUnit) Cycle() {
-	in := (<-au.Inputs["in"]).(InsIn)
-	res := 0
-	switch {
-	case in.Code == ins.MUL || in.Code == ins.MULI:
-		res = in.Op2 * in.Op3
-	case in.Code == ins.ADD || in.Code == ins.ADDI:
-		res = in.Op2 + in.Op3
-	case in.Code == ins.SUB || in.Code == ins.SUBI:
-		res = in.Op2 - in.Op3
-	case in.Code == ins.XOR || in.Code == ins.XORI:
-		res = in.Op2 ^ in.Op3
-	}
+  in := (<-au.Inputs["in"]).(InsIn)
+  res := 0
+  switch {
+  case in.Code == ins.MUL || in.Code == ins.MULI:
+    res = in.Op2 * in.Op3
+  case in.Code == ins.ADD || in.Code == ins.ADDI:
+    res = in.Op2 + in.Op3
+  case in.Code == ins.SUB || in.Code == ins.SUBI:
+    res = in.Op2 - in.Op3
+  case in.Code == ins.XOR || in.Code == ins.XORI:
+    res = in.Op2 ^ in.Op3
+  }
 
-	au.Outputs["out"] <- res
+  au.Outputs["out"] <- res
 
 }
