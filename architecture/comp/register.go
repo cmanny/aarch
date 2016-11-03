@@ -5,6 +5,18 @@ import (
   "fmt"
 )
 
+const (
+  REG_READ = iota
+  REG_WRITE
+  REG_CLEAR
+)
+
+type RegOp struct {
+  op int
+  id int
+  data []byte
+}
+
 type RegisterFile struct {
   Communicator
   regs  [32]int
