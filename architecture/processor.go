@@ -23,8 +23,8 @@ type Processor struct {
 
   mem *comp.Memory
 
-  fu *comp.NullComponent
-  du *comp.NullComponent
+  fu *comp.Fetch
+  du *comp.Decode
 
   cu *exe.ControlUnit
   au *exe.ArithmeticUnit
@@ -41,28 +41,6 @@ func (p *Processor) preRun() {
   if p.printDebug {
     fmt.Println("Debug ON")
   }
-}
-
-func (p *Processor) fetch() []byte {
-  p.mem.In(p, "in1") <- p.ip
-  bytes := <-p.mem.Out(p, "out1")
-  fmt.Println(bytes)
-
-  p.cu.In(p.mem, "ins") <- bytes
-  p.ip = (<-p.cu.Out(p, "ip")).(int)
-  if p.ip == -1 {
-    // bail
-    p.exit = true
-  }
-  return bytes.([]byte)
-}
-
-func (p *Processor) decode(bytes []byte) *exe.InsIn {
-  if bytes == nil {
-    return nil
-  }
-  insIn := &exe.InsIn{}
-  return insIn
 }
 
 func (p *Processor) execute(in *exe.InsIn) {
@@ -83,8 +61,8 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory) {
   /* Init all sub components */
   p.mem = mem
 
-  p.fu = &comp.NullComponent{}
-  p.du = &comp.NullComponent{}
+  p.fu = &comp.Fetch{}
+  p.du = &comp.Decode{}
 
   p.cu = &exe.ControlUnit{}
   p.cu.Init()
@@ -94,8 +72,6 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory) {
 
   p.lu = &exe.LogicUnit{}
   p.lu.Init()
-
-  p.ip = (<-p.cu.Out(p, "ip")).(int)
 
   comp.AddAll(
     &comp.CompWrapper{
@@ -153,7 +129,6 @@ func (p *Processor) Run() {
     for _, c := range comp.Comps {
       go c.Obj.Cycle()
     }
-    p.execute(p.decode(p.fetch()))
 
     if p.exit {
       return

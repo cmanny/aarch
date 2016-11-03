@@ -1,12 +1,11 @@
 package comp
 
-import (
-  "fmt"
-)
 
 /* Component channel keys */
 const (
-  MEM_IN_1 = iota
+  CYCLE = iota
+
+  MEM_IN_1
   MEM_IN_2
   MEM_IN_3
   MEM_OUT_1
@@ -25,6 +24,12 @@ const (
   PIPE_CONTROL_IN
   PIPE_MEMORY_IN
   PIPE_LOGIC_IN
+
+  PIPE_DECODE_OUT
+  PIPE_ARITH_OUT
+  PIPE_CONTROL_OUT
+  PIPE_MEMORY_OUT
+  PIPE_LOGIC_OUT
 )
 
 var Comps []*CompWrapper
@@ -40,7 +45,10 @@ func AddAll(cs ...*CompWrapper) {
   }
 }
 
-func Join(a Component, b Component, chanId int) {
+func Join(a *Communicator, b *Communicator, chanId int, bufSize int) {
+  chanRef := make(chan interface{}, bufSize)
+  a.SetChan(chanId, chanRef)
+  b.SetChan(chanId, chanRef)
 
 }
 
@@ -54,6 +62,7 @@ type Component interface {
 type Edge struct{
   A Component
   B Component
+  data interface{}
 }
 
 type CompWrapper struct {
@@ -73,22 +82,24 @@ func (n *NullComponent) Cycle()            {}
 /* All components need communicators */
 
 type Communicator struct {
-  Inputs  map[string]chan interface{}
-  Outputs map[string]chan interface{}
+  chans  map[int]chan interface{}
+  recvd  map[int]interface{}
 }
 
 func (c *Communicator) InitComms() {
-  c.Inputs = make(map[string]chan interface{})
-  c.Outputs = make(map[string]chan interface{})
+  c.chans = make(map[int]chan interface{})
+  c.recvd = make(map[int]interface{})
 }
 
-func (c *Communicator) In(ct Component, in string) chan interface{} {
-  fmt.Printf("%p \n", &ct)
-
-  return c.Inputs[in]
+func (c *Communicator) Send(chanId int, data interface{}) {
+  c.chans[chanId] <- data
 }
 
-func (c *Communicator) Out(ct Component, out string) chan interface{} {
-  fmt.Printf("%p \n", &ct)
-  return c.Outputs[out]
+func (c *Communicator) Recv(chanId int) interface{} {
+  c.recvd[chanId] = <- c.chans[chanId]
+  return c.recvd[chanId]
+}
+
+func (c *Communicator) SetChan(chanId int, chanRef chan interface{}) {
+  c.chans[chanId] = chanRef
 }

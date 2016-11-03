@@ -25,12 +25,6 @@ type RegisterFile struct {
 
 func (rf *RegisterFile) Init() {
   rf.InitComms()
-
-  rf.Inputs["inr"] = make(chan interface{}, 1)
-  rf.Outputs["outr"] = make(chan interface{}, 1)
-
-  rf.Inputs["w1"] = make(chan interface{}, 1)
-  rf.Outputs["w2"] = make(chan interface{}, 1)
 }
 
 func (rf *RegisterFile) Data() interface{} {

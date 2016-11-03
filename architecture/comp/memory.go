@@ -21,8 +21,6 @@ type Memory struct {
 func (mu *Memory) Init() {
   mu.InitComms()
   mu.opsPerCycle = 2
-  mu.Inputs["in1"] = make(chan interface{}, 1)
-  mu.Outputs["out1"] = make(chan interface{}, 1)
 }
 
 func (mu *Memory) Data() interface{} {
@@ -34,8 +32,8 @@ func (mu *Memory) State() string {
 }
 
 func (mu *Memory) Cycle() {
-  index := (<-mu.Inputs["in1"]).(int)
-  mu.Outputs["out1"] <- mu.bytes[index : index+4]
+  index := mu.Recv(MEM_IN_1).(int)
+  mu.Send(MEM_OUT_1, mu.bytes[index : index+4])
 }
 
 func (m *Memory) Fill(bytes []byte, index int) {

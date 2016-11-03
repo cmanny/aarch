@@ -23,7 +23,7 @@ func (au *ArithmeticUnit) State() string {
 }
 
 func (au *ArithmeticUnit) Cycle() {
-  in := (<-au.Inputs["in"]).(InsIn)
+  in := au.Recv(comp.PIPE_ARITH_IN).(InsIn)
   res := 0
   switch {
   case in.Code == ins.MUL || in.Code == ins.MULI:
@@ -36,6 +36,6 @@ func (au *ArithmeticUnit) Cycle() {
     res = in.Op2 ^ in.Op3
   }
 
-  au.Outputs["out"] <- res
+  au.Send(comp.PIPE_ARITH_OUT, res)
 
 }

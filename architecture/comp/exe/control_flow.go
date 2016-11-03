@@ -16,10 +16,6 @@ func (cu *ControlUnit) Init() {
 
   cu.ip = 0
 
-  cu.Inputs["ins"] = make(chan interface{}, 1)
-  cu.Outputs["ip"] = make(chan interface{}, 1)
-
-  cu.Outputs["ip"] <- cu.ip
 }
 
 func (cu *ControlUnit) Data() interface{} {
@@ -31,7 +27,7 @@ func (cu *ControlUnit) State() string {
 }
 
 func (cu *ControlUnit) Cycle() {
-  bytes := (<-cu.Inputs["ins"]).([]byte)
+  bytes := cu.Recv(comp.PIPE_CONTROL_IN).([]byte)
 
   switch bytes[0] {
   case ins.JMP:
@@ -42,5 +38,5 @@ func (cu *ControlUnit) Cycle() {
     cu.ip += 4
   }
 
-  cu.Outputs["ip"] <- cu.ip
+  cu.Send(comp.PIPE_CONTROL_OUT, cu.ip)
 }
