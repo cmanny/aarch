@@ -4,12 +4,6 @@ const (
   MEM_READ = iota
   MEM_WRITE
   MEM_RESET
-  MEM_CHAN1_IN
-  MEM_CHAN2_IN
-  MEM_CHAN3_IN
-  MEM_CHAN1_OUT
-  MEM_CHAN2_OUT
-  MEM_CHAN3_OUT
 )
 
 type MemOp struct {

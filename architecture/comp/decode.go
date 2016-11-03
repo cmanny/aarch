@@ -1,21 +1,21 @@
 package comp
 
 type Decode struct {
-	Communicator
+  Communicator
 }
 
 func (fu *Decode) Init() {
-	fu.InitComms()
-	fu.Inputs["reg_in"] = make(chan interface{}, 1)
-	fu.Outputs["reg_out"] = make(chan interface{}, 1)
+  fu.InitComms()
+  fu.Inputs["reg_in"] = make(chan interface{}, 1)
+  fu.Outputs["reg_out"] = make(chan interface{}, 1)
 }
 
 func (fu *Decode) Data() interface{} {
-	return ""
+  return ""
 }
 
 func (fu *Decode) State() string {
-	return ""
+  return ""
 }
 
 func (fu *Decode) Cycle() {
