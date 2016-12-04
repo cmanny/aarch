@@ -15,6 +15,8 @@ type Processor struct {
   printDebug bool
   exit       bool
 
+  cycle chan int
+
   ip int
 
   is *ins.InstructionSet
@@ -54,9 +56,10 @@ func (p *Processor) execute(in *exe.InsIn) {
   Public methods of Processor
 **/
 
-func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory) {
+func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan int) {
   comp.Init()
   p.is = is
+  p.cycle = cycle
 
   /* Init all sub components */
   p.mem = mem
