@@ -23,13 +23,11 @@ const (
   PIPE_ARITH_IN
   PIPE_CONTROL_IN
   PIPE_MEMORY_IN
-  PIPE_LOGIC_IN
 
   PIPE_DECODE_OUT
   PIPE_ARITH_OUT
   PIPE_CONTROL_OUT
   PIPE_MEMORY_OUT
-  PIPE_LOGIC_OUT
 )
 
 var Comps []*CompWrapper
@@ -58,6 +56,7 @@ type Component interface {
   State() string
   Cycle() /* advance one cycle */
 }
+
 
 type Edge struct{
   A Component

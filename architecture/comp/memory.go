@@ -7,14 +7,14 @@ const (
 )
 
 type MemOp struct {
-  op int
-  addr int
-  data []byte
+  Op int
+  Addr int
+  Data []byte
 }
 
 type Memory struct {
   Communicator
-  bytes [4096]byte
+  bytes [4096] byte
   opsPerCycle int
 }
 

@@ -43,6 +43,7 @@ const (
 
 const (
   HALT = iota
+  NOP
 
   ADD
   SUB
@@ -71,14 +72,14 @@ const (
   JEQ
   JNE
   JL
-  JGE
+  JG
   JRND
 
   AJMP
   AJEQ
   AJNE
   AJL
-  AJGE
+  AJG
 
   CMP
   CMPI
@@ -143,6 +144,7 @@ func (is *InstructionSet) RegStrDecode(reg string) (byte, error) {
 
 func (is *InstructionSet) strMapsInit() {
 
+  is.ins_str["nop"] = NOP
   is.ins_str["add"] = ADD
   is.ins_str["sub"] = SUB
   is.ins_str["mul"] = MUL
@@ -166,14 +168,14 @@ func (is *InstructionSet) strMapsInit() {
   is.ins_str["jeq"] = JEQ
   is.ins_str["jne"] = JNE
   is.ins_str["jl"] = JL
-  is.ins_str["jge"] = JGE
+  is.ins_str["jg"] = JG
   is.ins_str["jrnd"] = JRND
 
   is.ins_str["ajmp"] = AJMP
   is.ins_str["ajeq"] = AJEQ
   is.ins_str["ajne"] = AJNE
   is.ins_str["ajl"] = AJL
-  is.ins_str["ajge"] = AJGE
+  is.ins_str["ajg"] = AJG
 
   is.ins_str["cmp"] = CMP
   is.ins_str["cmpi"] = CMPI
@@ -195,6 +197,7 @@ func (is *InstructionSet) strMapsInit() {
 }
 
 func (is *InstructionSet) insMapInit() {
+  is.ins_map[NOP] = InsInfo{TYPE_ARITH, OP_EMPTY, OP_EMPTY, OP_EMPTY}
 
   /* Arithmetic */
   is.ins_map[ADD] = InsInfo{TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
@@ -210,6 +213,9 @@ func (is *InstructionSet) insMapInit() {
   is.ins_map[LEAL] = InsInfo{TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_CONSTANT_8}
   is.ins_map[LEAH] = InsInfo{TYPE_ARITH, OP_REGISTER, OP_CONSTANT_8, OP_CONSTANT_8}
 
+  is.ins_map[CMP] = InsInfo{TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_REGISTER}
+  is.ins_map[CMPI] = InsInfo{TYPE_ARITH, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
+
   /* Data movement */
   is.ins_map[MOV] = InsInfo{TYPE_MOVE, OP_REGISTER, OP_REGISTER, OP_EMPTY}
   is.ins_map[MOVI] = InsInfo{TYPE_MOVE, OP_REGISTER, OP_CONSTANT_8, OP_EMPTY}
@@ -223,22 +229,16 @@ func (is *InstructionSet) insMapInit() {
   is.ins_map[JEQ] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
   is.ins_map[JNE] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
   is.ins_map[JL] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
-  is.ins_map[JGE] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
+  is.ins_map[JG] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
   is.ins_map[JRND] = InsInfo{TYPE_CONTROL, OP_ADDRESS_8, OP_REGISTER, OP_EMPTY}
 
   is.ins_map[AJMP] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_EMPTY, OP_EMPTY}
   is.ins_map[AJEQ] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
   is.ins_map[AJNE] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
   is.ins_map[AJL] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
-  is.ins_map[AJGE] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
+  is.ins_map[AJG] = InsInfo{TYPE_CONTROL, OP_IND_ADDR, OP_REGISTER, OP_EMPTY}
 
   is.ins_map[HALT] = InsInfo{TYPE_CONTROL, OP_EMPTY, OP_EMPTY, OP_EMPTY}
-
-  /* Logical */
-
-  is.ins_map[CMP] = InsInfo{TYPE_LOGIC, OP_REGISTER, OP_REGISTER, OP_REGISTER}
-
-  is.ins_map[CMPI] = InsInfo{TYPE_LOGIC, OP_REGISTER, OP_REGISTER, OP_CONSTANT_8}
 
   /* IO */
 
