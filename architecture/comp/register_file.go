@@ -36,7 +36,10 @@ func (rf *RegisterFile) State() string {
 }
 
 func (rf *RegisterFile) Cycle() {
-
+  for {
+    rf.Recv(CYCLE)
+    
+  }
 }
 
 func (rf *RegisterFile) Contents() {

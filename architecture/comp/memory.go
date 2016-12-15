@@ -32,8 +32,12 @@ func (mu *Memory) State() string {
 }
 
 func (mu *Memory) Cycle() {
-  index := mu.Recv(MEM_IN_1).(int)
-  mu.Send(MEM_OUT_1, mu.bytes[index : index+4])
+  for {
+    mu.Recv(CYCLE)
+
+    index := mu.Recv(MEM_IN_1).(int)
+    mu.Send(MEM_OUT_1, mu.bytes[index : index+4])
+  }
 }
 
 func (m *Memory) Fill(bytes []byte, index int) {

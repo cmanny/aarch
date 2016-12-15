@@ -18,4 +18,7 @@ func (fu *Decode) State() string {
 }
 
 func (fu *Decode) Cycle() {
+  for {
+    fu.Recv(CYCLE)
+  }
 }

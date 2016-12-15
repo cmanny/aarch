@@ -43,7 +43,7 @@ func AddAll(cs ...*CompWrapper) {
   }
 }
 
-func Join(a *Communicator, b *Communicator, chanId int, bufSize int) {
+func Join(a Communicatizer, b Communicatizer, chanId int, bufSize int) {
   chanRef := make(chan interface{}, bufSize)
   a.SetChan(chanId, chanRef)
   b.SetChan(chanId, chanRef)
@@ -51,7 +51,7 @@ func Join(a *Communicator, b *Communicator, chanId int, bufSize int) {
 }
 
 /* All components must satisfy the component functions */
-type Component interface {
+type Componentizer interface {
   Data() interface{}
   State() string
   Cycle() /* advance one cycle */
@@ -64,14 +64,14 @@ type PipelineData struct {
 
 
 type Edge struct{
-  A Component
-  B Component
+  A Componentizer
+  B Componentizer
   data interface{}
 }
 
 type CompWrapper struct {
   Name  string
-  Obj   Component
+  Obj   interface{}
   Shape string
   Size  int
   Color string
@@ -84,6 +84,12 @@ func (n *NullComponent) State() string     { return "" }
 func (n *NullComponent) Cycle()            {}
 
 /* All components need communicators */
+
+type Communicatizer interface {
+  Send(chanId int, data interface{})
+  Recv(chanId int) interface{}
+  SetChan(int, chan interface{})
+}
 
 type Communicator struct {
   chans  map[int]chan interface{}

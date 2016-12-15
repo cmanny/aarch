@@ -17,4 +17,8 @@ func (rs* ReservationStation) State() string {
 }
 
 func (rs* ReservationStation) Cycle() {
+  for {
+    rs.Recv(CYCLE)
+
+  }
 }

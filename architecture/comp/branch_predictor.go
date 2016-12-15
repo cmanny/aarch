@@ -17,4 +17,7 @@ func (bp* BranchPredictor) State() string {
 }
 
 func (bp* BranchPredictor) Cycle() {
+  for {
+    bp.Recv(CYCLE)
+  }
 }

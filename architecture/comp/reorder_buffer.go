@@ -17,4 +17,7 @@ func (rb* ReorderBuffer) State() string {
 }
 
 func (rb* ReorderBuffer) Cycle() {
+  for {
+    rb.Recv(CYCLE)
+  }
 }

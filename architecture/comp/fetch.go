@@ -18,4 +18,7 @@ func (fu *Fetch) State() string {
 }
 
 func (fu *Fetch) Cycle() {
+  for {
+    fu.Recv(CYCLE)
+  }
 }

@@ -9,6 +9,7 @@ import (
 )
 
 type Processor struct {
+  comp.Communicator
   clockSpeed int
   numExUnits int
   printDebug bool
@@ -27,11 +28,7 @@ type Processor struct {
   fu *comp.Fetch
   du *comp.Decode
 
-  curs *comp.ReservationStation
-  au1rs *comp.ReservationStation
-  au2rs *comp.ReservationStation
-  murs *comp.ReservationStation
-
+  rs *comp.ReservationStation
 
   cu *comp.ControlUnit
   au1 *comp.ArithmeticUnit
@@ -67,6 +64,7 @@ func (p *Processor) execute(in *comp.InsIn) {
 
 func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan int) {
   comp.Init()
+  p.InitComms()
   p.is = is
   p.cycle = cycle
 
@@ -79,34 +77,27 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   p.du = &comp.Decode{}
   p.du.Init()
 
+  /* RS */
 
-  /* CU and RS Init */
-  p.curs = &comp.ReservationStation{}
-  p.curs.Init()
+  p.rs = &comp.ReservationStation{}
+  p.rs.Init()
+
+  /* CU */
 
   p.cu = &comp.ControlUnit{}
   p.cu.Init()
 
-  /* AU1 and RS Init */
-
-  p.au1rs = &comp.ReservationStation{}
-  p.curs.Init()
+  /* AU1 */
 
   p.au1 = &comp.ArithmeticUnit{}
   p.au1.Init()
 
-  /* AU2 and RS Init */
-
-  p.au2rs = &comp.ReservationStation{}
-  p.curs.Init()
+  /* AU2 */
 
   p.au2 = &comp.ArithmeticUnit{}
-  p.au1.Init()
+  p.au2.Init()
 
-  /* MU and RS Init */
-
-  p.murs = &comp.ReservationStation{}
-  p.curs.Init()
+  /* MU  */
 
   p.mu = &comp.MemoryUnit{}
   p.mu.Init()
@@ -170,9 +161,14 @@ func (p *Processor) Run() {
   p.preRun()
   fmt.Println("Processor beginning")
 
+  for _, c := range comp.Comps {
+    comp.Join(p, c.Obj.(comp.Communicatizer), comp.CYCLE, 1)
+    go c.Obj.(comp.Componentizer).Cycle()
+  }
+
   for {
     for _, c := range comp.Comps {
-      go c.Obj.Cycle()
+      c.Obj.(comp.Communicatizer).Send(comp.CYCLE, 1)
     }
 
     if p.exit {
