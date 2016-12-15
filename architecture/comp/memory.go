@@ -9,6 +9,7 @@ const (
 type MemOp struct {
   Op int
   Addr int
+  Len int
   Data []byte
 }
 
@@ -32,11 +33,31 @@ func (mu *Memory) State() string {
 }
 
 func (mu *Memory) Cycle() {
+  chans := [][]int{
+    []int{MEM_IN_1, MEM_OUT_1},
+    []int{MEM_IN_2, MEM_OUT_2},
+    []int{MEM_IN_3, MEM_OUT_3},
+  }
+
   for {
     mu.Recv(CYCLE)
 
-    index := mu.Recv(MEM_IN_1).(int)
-    mu.Send(MEM_OUT_1, mu.bytes[index : index+4])
+    for i := 0; i < 5; i++ {
+      for _, chanPair := range chans {
+        ok, memOpIntf := mu.AsyncRecv(chanPair[0])
+        if ok {
+          memOp := memOpIntf.(MemOp)
+          switch memOp.Op {
+          case MEM_READ:
+            mu.Send(chanPair[1], mu.bytes[memOp.Addr : memOp.Addr + memOp.Len])
+          case MEM_WRITE:
+            for j := 0; j < memOp.Len; j++ {
+              mu.bytes[memOp.Addr + j] = memOp.Data[j]
+            }
+          }
+        }
+      }
+    }
   }
 }
 

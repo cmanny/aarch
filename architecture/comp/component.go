@@ -1,5 +1,9 @@
 package comp
 
+import (
+  "fmt"
+  "reflect"
+)
 
 /* Component channel keys */
 const (
@@ -107,7 +111,17 @@ func (c *Communicator) Send(chanId int, data interface{}) {
 
 func (c *Communicator) Recv(chanId int) interface{} {
   c.recvd[chanId] = <- c.chans[chanId]
+  fmt.Println(reflect.ValueOf(c))
   return c.recvd[chanId]
+}
+
+func (c *Communicator) AsyncRecv(chanId int) (bool, interface{}) {
+  select {
+    case c.recvd[chanId] = <- c.chans[chanId]:
+      return true, c.recvd[chanId]
+    default:
+  }
+  return false, c.recvd[chanId]
 }
 
 func (c *Communicator) SetChan(chanId int, chanRef chan interface{}) {

@@ -30,7 +30,7 @@ func (au *ArithmeticUnit) State() string {
 func (au *ArithmeticUnit) Cycle() {
   for {
     au.Recv(CYCLE)
-    
+
     in := au.Recv(PIPE_ARITH_IN).(InsIn)
     out := in
     switch {

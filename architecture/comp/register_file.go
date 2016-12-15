@@ -12,14 +12,15 @@ const (
 )
 
 type RegOp struct {
-  op int
-  id int
-  data []byte
+  Op int
+  Id int
+  Len int
+  Data [4]byte
 }
 
 type RegisterFile struct {
   Communicator
-  regs  [32]int
+  regs  [32][4]byte
   Flags int
 }
 
@@ -36,9 +37,29 @@ func (rf *RegisterFile) State() string {
 }
 
 func (rf *RegisterFile) Cycle() {
+  chans := [][]int{
+    []int{REG_IN_1, REG_OUT_1},
+    []int{REG_IN_2, REG_OUT_2},
+    []int{REG_IN_3, REG_OUT_3},
+  }
+
   for {
     rf.Recv(CYCLE)
-    
+
+    for i := 0; i < 5; i++ {
+      for _, chanPair := range chans {
+        ok, regOpIntf := rf.AsyncRecv(chanPair[0])
+        if ok {
+          regOp := regOpIntf.(RegOp)
+          switch regOp.Op {
+          case REG_READ:
+            rf.Send(chanPair[1], rf.regs[regOp.Id])
+          case REG_WRITE:
+            rf.regs[regOp.Id] = regOp.Data
+          }
+        }
+      }
+    }
   }
 }
 
