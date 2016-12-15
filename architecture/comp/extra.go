@@ -1,4 +1,4 @@
-package exe
+package comp
 
 type InsIn struct {
   Code byte

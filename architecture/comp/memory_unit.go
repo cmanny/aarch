@@ -1,10 +1,9 @@
-package exe
+package comp
 
 //"github.com/cmanny/aarch/architecture/ins"
-import "github.com/cmanny/aarch/architecture/comp"
 
 type MemoryUnit struct {
-  comp.Communicator
+  Communicator
 }
 
 func (mu *MemoryUnit) Init() {

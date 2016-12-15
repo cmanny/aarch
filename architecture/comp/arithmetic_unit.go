@@ -1,12 +1,11 @@
-package exe
+package comp
 
 import (
-  "github.com/cmanny/aarch/architecture/comp"
   "github.com/cmanny/aarch/architecture/ins"
 )
 
 type ArithmeticUnit struct {
-  comp.Communicator
+  Communicator
   currentIns InsIn
 }
 
@@ -23,7 +22,7 @@ func (au *ArithmeticUnit) State() string {
 }
 
 func (au *ArithmeticUnit) Cycle() {
-  in := au.Recv(comp.PIPE_ARITH_IN).(InsIn)
+  in := au.Recv(PIPE_ARITH_IN).(InsIn)
   res := 0
   switch {
   case in.Code == ins.MUL || in.Code == ins.MULI:
@@ -36,6 +35,6 @@ func (au *ArithmeticUnit) Cycle() {
     res = in.Op2 ^ in.Op3
   }
 
-  au.Send(comp.PIPE_ARITH_OUT, res)
+  au.Send(PIPE_ARITH_OUT, res)
 
 }

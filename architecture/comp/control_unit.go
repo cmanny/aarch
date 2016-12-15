@@ -1,12 +1,11 @@
-package exe
+package comp
 
 import (
-  "github.com/cmanny/aarch/architecture/comp"
   "github.com/cmanny/aarch/architecture/ins"
 )
 
 type ControlUnit struct {
-  comp.Communicator
+  Communicator
 
   ip int
 }
@@ -27,7 +26,7 @@ func (cu *ControlUnit) State() string {
 }
 
 func (cu *ControlUnit) Cycle() {
-  bytes := cu.Recv(comp.PIPE_CONTROL_IN).([]byte)
+  bytes := cu.Recv(PIPE_CONTROL_IN).([]byte)
 
   switch bytes[0] {
   case ins.JMP:
@@ -38,5 +37,5 @@ func (cu *ControlUnit) Cycle() {
     cu.ip += 4
   }
 
-  cu.Send(comp.PIPE_CONTROL_OUT, cu.ip)
+  cu.Send(PIPE_CONTROL_OUT, cu.ip)
 }

@@ -4,7 +4,6 @@ import (
   "fmt"
 
   "github.com/cmanny/aarch/architecture/comp"
-  "github.com/cmanny/aarch/architecture/comp/exe"
   "github.com/cmanny/aarch/architecture/ins"
   //"bufio"
 )
@@ -28,9 +27,10 @@ type Processor struct {
   fu *comp.Fetch
   du *comp.Decode
 
-  cu *exe.ControlUnit
-  au *exe.ArithmeticUnit
-  lu *exe.LogicUnit
+  cu *comp.ControlUnit
+  au1 *comp.ArithmeticUnit
+  au2 *comp.ArithmeticUnit
+  mu *comp.MemoryUnit
 
   rf *comp.RegisterFile
 }
@@ -45,7 +45,7 @@ func (p *Processor) preRun() {
   }
 }
 
-func (p *Processor) execute(in *exe.InsIn) {
+func (p *Processor) execute(in *comp.InsIn) {
   if in == nil {
     return
   }
@@ -67,14 +67,18 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   p.fu = &comp.Fetch{}
   p.du = &comp.Decode{}
 
-  p.cu = &exe.ControlUnit{}
+  p.cu = &comp.ControlUnit{}
   p.cu.Init()
 
-  p.au = &exe.ArithmeticUnit{}
-  p.au.Init()
+  p.au1 = &comp.ArithmeticUnit{}
+  p.au1.Init()
 
-  p.lu = &exe.LogicUnit{}
-  p.lu.Init()
+  p.au2 = &comp.ArithmeticUnit{}
+  p.au1.Init()
+
+  p.mu = &comp.MemoryUnit{}
+  p.mu.Init()
+
 
   comp.AddAll(
     &comp.CompWrapper{
@@ -94,12 +98,16 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
       Obj:  p.cu,
     },
     &comp.CompWrapper{
-      Name: "ArithmeticUnit",
-      Obj:  p.au,
+      Name: "ArithmeticUnit1",
+      Obj:  p.au1,
     },
     &comp.CompWrapper{
-      Name: "LogicUnit",
-      Obj:  p.lu,
+      Name: "ArithmeticUnit2",
+      Obj:  p.au2,
+    },
+    &comp.CompWrapper{
+      Name: "MemoryUnit",
+      Obj:  p.mu,
     },
   )
 }
