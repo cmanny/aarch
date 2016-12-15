@@ -7,6 +7,7 @@ import (
 
 type MemoryUnit struct {
   Communicator
+  PipelineData
 }
 
 func (mu *MemoryUnit) Init() {

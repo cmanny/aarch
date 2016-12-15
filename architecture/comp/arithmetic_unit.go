@@ -12,7 +12,7 @@ const (
 
 type ArithmeticUnit struct {
   Communicator
-  currentIns InsIn
+  PipelineData
 }
 
 func (au *ArithmeticUnit) Init() {

@@ -2,6 +2,7 @@ package comp
 
 type Decode struct {
   Communicator
+  PipelineData
 }
 
 func (fu *Decode) Init() {

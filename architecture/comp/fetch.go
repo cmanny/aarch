@@ -2,6 +2,7 @@ package comp
 
 type Fetch struct {
   Communicator
+  PipelineData
 }
 
 func (fu *Fetch) Init() {

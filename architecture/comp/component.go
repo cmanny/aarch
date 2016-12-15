@@ -57,6 +57,11 @@ type Component interface {
   Cycle() /* advance one cycle */
 }
 
+type PipelineData struct {
+  current interface{}
+  next interface{}
+}
+
 
 type Edge struct{
   A Component

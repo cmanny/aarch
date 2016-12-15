@@ -6,7 +6,7 @@ import (
 
 type ControlUnit struct {
   Communicator
-
+  PipelineData
 }
 
 func (cu *ControlUnit) Init() {
