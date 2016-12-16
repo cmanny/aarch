@@ -166,6 +166,8 @@ func (p *Processor) Run() {
   comp.Join(p.mem, p.fu, comp.MEM_IN_1, 1)
   comp.Join(p.mem, p.fu, comp.MEM_OUT_1, 1)
 
+  comp.Join(p.fu, p.du, comp.PIPE_DECODE_IN, 1)
+
 
   for _, c := range comp.Comps {
     comp.Join(p, c.Obj.(comp.Communicatizer), comp.CYCLE, 1)
