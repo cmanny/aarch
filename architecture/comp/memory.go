@@ -1,5 +1,6 @@
 package comp
 
+
 const (
   MEM_READ = iota
   MEM_WRITE
@@ -42,7 +43,7 @@ func (mu *Memory) Cycle() {
   for {
     mu.Recv(CYCLE)
 
-    for i := 0; i < 5; i++ {
+    for i := 0; i < 1; i++ {
       for _, chanPair := range chans {
         ok, memOpIntf := mu.AsyncRecv(chanPair[0])
         if ok {

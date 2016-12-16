@@ -23,9 +23,11 @@ func (mu *MemoryUnit) State() string {
 }
 
 func (mu *MemoryUnit) Cycle() {
+  
   for {
     mu.Recv(CYCLE)
-    
+
+
     in := mu.Recv(PIPE_MEMORY_IN).(InsIn)
     out := in
     switch {

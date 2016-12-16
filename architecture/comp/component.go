@@ -1,8 +1,8 @@
 package comp
 
 import (
-  "fmt"
-  "reflect"
+   //"fmt"
+  // "reflect"
 )
 
 /* Component channel keys */
@@ -91,7 +91,10 @@ func (n *NullComponent) Cycle()            {}
 
 type Communicatizer interface {
   Send(chanId int, data interface{})
+  AsyncSend(chanId int, data interface{}) bool
   Recv(chanId int) interface{}
+  AsyncRecv(chanId int) (bool, interface{})
+
   SetChan(int, chan interface{})
 }
 
@@ -109,15 +112,26 @@ func (c *Communicator) Send(chanId int, data interface{}) {
   c.chans[chanId] <- data
 }
 
+func (c *Communicator) AsyncSend(chanId int, data interface{}) bool {
+  select {
+  case c.chans[chanId] <- data:
+    return true
+    default:
+  }
+  return false
+}
+
 func (c *Communicator) Recv(chanId int) interface{} {
   c.recvd[chanId] = <- c.chans[chanId]
-  fmt.Println(reflect.ValueOf(c))
   return c.recvd[chanId]
 }
 
+
 func (c *Communicator) AsyncRecv(chanId int) (bool, interface{}) {
+  //fmt.Println(c.chans)
   select {
     case c.recvd[chanId] = <- c.chans[chanId]:
+
       return true, c.recvd[chanId]
     default:
   }

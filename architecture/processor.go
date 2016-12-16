@@ -2,6 +2,7 @@ package architecture
 
 import (
   "fmt"
+  "time"
 
   "github.com/cmanny/aarch/architecture/comp"
   "github.com/cmanny/aarch/architecture/ins"
@@ -105,6 +106,7 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
 
 
 
+
   comp.AddAll(
     &comp.CompWrapper{
       Name: "RAM",
@@ -161,6 +163,10 @@ func (p *Processor) Run() {
   p.preRun()
   fmt.Println("Processor beginning")
 
+  comp.Join(p.mem, p.fu, comp.MEM_IN_1, 1)
+  comp.Join(p.mem, p.fu, comp.MEM_OUT_1, 1)
+
+
   for _, c := range comp.Comps {
     comp.Join(p, c.Obj.(comp.Communicatizer), comp.CYCLE, 1)
     go c.Obj.(comp.Componentizer).Cycle()
@@ -168,8 +174,14 @@ func (p *Processor) Run() {
 
   for {
     for _, c := range comp.Comps {
-      c.Obj.(comp.Communicatizer).Send(comp.CYCLE, 1)
+      if !c.Obj.(comp.Communicatizer).AsyncSend(comp.CYCLE, 1) {
+        //fmt.Println(fmt.Sprintf("%p did not receive\n", c.Obj))
+      } else {
+        //fmt.Println(fmt.Sprintf("%p did receive\n", c.Obj))
+      }
+
     }
+    time.Sleep(time.Millisecond * 10)
 
     if p.exit {
       return
