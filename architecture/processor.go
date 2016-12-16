@@ -140,6 +140,14 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
       Obj:  p.rs,
     },
     &comp.CompWrapper{
+      Name: "ReorderBuffer",
+      Obj:  p.rb,
+    },
+    &comp.CompWrapper{
+      Name: "BranchPredictor",
+      Obj:  p.bp,
+    },
+    &comp.CompWrapper{
       Name: "ControlUnit",
       Obj:  p.cu,
     },
