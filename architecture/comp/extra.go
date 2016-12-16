@@ -11,6 +11,11 @@ type InsIn struct {
   Op1 int
   Op2  int
   Op3  int
+
+  Op1Valid bool
+  Op2Valid bool
+  Op3Valid bool
+
   Valid bool
   Speculative bool
 

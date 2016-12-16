@@ -19,5 +19,6 @@
   subi c c 1
   cmpi d c 0
   jne .complex d
+  halt
 
 .data

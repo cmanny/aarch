@@ -25,12 +25,16 @@ const (
 
   PIPE_DECODE_IN
   PIPE_ARITH_IN
+  PIPE_ARITH_IN_1
+  PIPE_ARITH_IN_2
   PIPE_CONTROL_IN
   PIPE_MEMORY_IN
   PIPE_RS_IN
 
   PIPE_DECODE_OUT
   PIPE_ARITH_OUT
+  PIPE_ARITH_OUT_1
+  PIPE_ARITH_OUT_2
   PIPE_CONTROL_OUT
   PIPE_MEMORY_OUT
 )
@@ -52,6 +56,13 @@ func Join(a Communicatizer, b Communicatizer, chanId int, bufSize int) {
   chanRef := make(chan interface{}, bufSize)
   a.SetChan(chanId, chanRef)
   b.SetChan(chanId, chanRef)
+
+}
+
+func JoinDifferent(a Communicatizer, aChanId int, b Communicatizer, bChanId int, bufSize int) {
+  chanRef := make(chan interface{}, bufSize)
+  a.SetChan(aChanId, chanRef)
+  b.SetChan(bChanId, chanRef)
 
 }
 

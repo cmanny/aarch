@@ -83,6 +83,16 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   p.rs = &comp.ReservationStation{}
   p.rs.Init()
 
+  /* ROB */
+
+  p.rb = &comp.ReorderBuffer{}
+  p.rb.Init()
+
+  /* BP */
+
+  p.bp = &comp.BranchPredictor{}
+  p.bp.Init()
+
   /* CU */
 
   p.cu = &comp.ControlUnit{}
@@ -103,6 +113,11 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   p.mu = &comp.MemoryUnit{}
   p.mu.Init()
 
+  /* RF */
+
+  p.rf = &comp.RegisterFile{}
+  p.rf.Init()
+
 
 
 
@@ -121,6 +136,10 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
       Obj:  p.du,
     },
     &comp.CompWrapper{
+      Name: "ReservationStation",
+      Obj:  p.rs,
+    },
+    &comp.CompWrapper{
       Name: "ControlUnit",
       Obj:  p.cu,
     },
@@ -137,6 +156,32 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
       Obj:  p.mu,
     },
   )
+
+  /* Joining components (important (do not forget))
+    The joining design isn't the best but it suffices for now
+    A better method would be much more explicit about channel identifiers
+    and would guarantee some level of correctness
+  */
+
+
+  comp.Join(p.mem, p.fu, comp.MEM_IN_1, 1)
+  comp.Join(p.mem, p.fu, comp.MEM_OUT_1, 1)
+
+  comp.Join(p.fu, p.du, comp.PIPE_DECODE_IN, 1)
+
+  comp.Join(p.du, p.rs, comp.PIPE_RS_IN, 1)
+
+  comp.JoinDifferent(p.rs, comp.PIPE_ARITH_IN_1, p.au1, comp.PIPE_ARITH_IN, 1)
+  comp.JoinDifferent(p.rs, comp.PIPE_ARITH_IN_2, p.au2, comp.PIPE_ARITH_IN, 1)
+  comp.Join(p.rs, p.cu, comp.PIPE_CONTROL_IN, 1)
+  comp.Join(p.rs, p.mu, comp.PIPE_MEMORY_IN, 1)
+
+  comp.JoinDifferent(p.rb, comp.PIPE_ARITH_OUT_1, p.au1, comp.PIPE_ARITH_OUT, 1)
+  comp.JoinDifferent(p.rb, comp.PIPE_ARITH_OUT_2, p.au2, comp.PIPE_ARITH_OUT, 1)
+  comp.Join(p.rb, p.cu, comp.PIPE_CONTROL_OUT, 1)
+  comp.Join(p.rb, p.mu, comp.PIPE_MEMORY_OUT, 1)
+
+
 }
 
 func (p *Processor) Data() interface{} {
@@ -162,12 +207,6 @@ func (p *Processor) SetIP(ip int) {
 func (p *Processor) Run() {
   p.preRun()
   fmt.Println("Processor beginning")
-
-  comp.Join(p.mem, p.fu, comp.MEM_IN_1, 1)
-  comp.Join(p.mem, p.fu, comp.MEM_OUT_1, 1)
-
-  comp.Join(p.fu, p.du, comp.PIPE_DECODE_IN, 1)
-
 
   for _, c := range comp.Comps {
     comp.Join(p, c.Obj.(comp.Communicatizer), comp.CYCLE, 1)
