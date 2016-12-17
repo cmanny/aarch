@@ -5,12 +5,15 @@ type Fetch struct {
   PipelineData
 
   ip int
+  tag int
   bw int
 }
 
 func (fu *Fetch) Init() {
   fu.InitComms()
   fu.ip = 0
+  fu.tag = 0
+
   fu.current = make([]InsIn, 0)
   fu.bw = 4
 }
@@ -39,11 +42,14 @@ func (fu *Fetch) Cycle() {
     // Turn bytes into InsIn objects
     for i := 0; i < len(bytes); i += 4 {
       insns[i] = InsIn{}
+      insns[i].Tag = fu.tag
       insns[i].Ip = fu.ip + i * 4
       insns[i].Code = bytes[i]
       insns[i].RawOp1 = bytes[i + 1]
       insns[i].RawOp2 = bytes[i + 2]
       insns[i].RawOp3 = bytes[i + 3]
+
+      fu.tag++
     }
     fu.current = insns
     fu.ip += fu.bw

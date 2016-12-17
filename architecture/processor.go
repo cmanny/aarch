@@ -172,12 +172,17 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   */
 
 
+  /* Mem to fetch */
   comp.Join(p.mem, p.fu, comp.MEM_IN_1, 1)
   comp.Join(p.mem, p.fu, comp.MEM_OUT_1, 1)
 
+  /* Fetch to Decode */
   comp.Join(p.fu, p.du, comp.PIPE_DECODE_IN, 1)
 
-  comp.Join(p.du, p.rs, comp.PIPE_RS_IN, 1)
+  /* Decode to ReorderBuffer */
+  comp.Join(p.du, p.rb, comp.PIPE_DECODE_OUT, 1)
+
+  comp.Join(p.rb, p.rs, comp.PIPE_RS_IN, 1)
 
   comp.JoinDifferent(p.rs, comp.PIPE_ARITH_IN_1, p.au1, comp.PIPE_ARITH_IN, 1)
   comp.JoinDifferent(p.rs, comp.PIPE_ARITH_IN_2, p.au2, comp.PIPE_ARITH_IN, 1)
