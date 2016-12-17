@@ -74,7 +74,7 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
 
   /* Fetch and decode init */
   p.fu = &comp.Fetch{}
-  p.fu.Init()
+  p.fu.Init(is)
   p.du = &comp.Decode{}
   p.du.Init()
 

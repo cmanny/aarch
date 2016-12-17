@@ -1,5 +1,10 @@
 package comp
 
+import (
+  "fmt"
+  "container/list"
+)
+
 const (
   RB_ISSUED = iota
   RB_EXECUTING
@@ -14,13 +19,13 @@ type BufferEntry struct {
 type ReorderBuffer struct {
   Communicator
 
-  buffer []BufferEntry
+  buffer *list.List
   decoded []InsIn
 }
 
 func (rb* ReorderBuffer) Init() {
   rb.InitComms()
-  rb.buffer = make([]BufferEntry, 0)
+  rb.buffer = list.New()
   rb.decoded = make([]InsIn, 0)
 }
 
@@ -36,14 +41,15 @@ func (rb* ReorderBuffer) Cycle() {
   for {
     rb.Recv(CYCLE)
     rb.Send(PIPE_RS_IN, rb.decoded)
-
-    new := make([]BufferEntry, len(rb.decoded))
-    for i, in := range rb.decoded {
-      new[i] = BufferEntry{}
-      new[i].state = RB_ISSUED
-      new[i].in = in
-    }
-    rb.buffer = append(rb.buffer, new...)
     rb.decoded = rb.Recv(PIPE_DECODE_OUT).([]InsIn)
+
+    for _, in := range rb.decoded {
+      entry := BufferEntry{}
+      entry.state = RB_ISSUED
+      entry.in = in
+
+      rb.buffer.PushBack(entry)
+    }
+    fmt.Println(rb.buffer)
   }
 }

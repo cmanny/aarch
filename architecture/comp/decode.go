@@ -1,6 +1,6 @@
 package comp
 
-import "fmt"
+//import "fmt"
 
 
 type Decode struct {
@@ -26,12 +26,13 @@ func (du *Decode) Cycle() {
   for {
     du.Recv(CYCLE)
     du.current = du.next
-    du.Send(PIPE_RS_IN, du.current)
+    du.Send(PIPE_DECODE_OUT, du.current)
     du.next = du.Recv(PIPE_DECODE_IN)
 
     // Decode instructions
     for _, insn := range du.current.([]InsIn) {
-      fmt.Println(insn)
+      //fmt.Println(insn)
+      if insn == insn {}
     }
 
   }

@@ -1,18 +1,29 @@
 package comp
 
+//import "fmt"
+
+import (
+  "github.com/cmanny/aarch/architecture/ins"
+)
+
 type Fetch struct {
   Communicator
   PipelineData
 
+  is *ins.InstructionSet
+
+  hitControl bool
   ip int
   tag int
   bw int
 }
 
-func (fu *Fetch) Init() {
+func (fu *Fetch) Init(is *ins.InstructionSet) {
   fu.InitComms()
   fu.ip = 0
   fu.tag = 0
+  fu.is = is
+  fu.hitControl = false
 
   fu.current = make([]InsIn, 0)
   fu.bw = 4
@@ -30,6 +41,7 @@ func (fu *Fetch) Cycle() {
   for {
     fu.Recv(CYCLE)
     fu.Send(PIPE_DECODE_IN, fu.current)
+    //fmt.Println("Sending fetched data")
 
     read := MemOp{}
     read.Op = MEM_READ
@@ -37,22 +49,32 @@ func (fu *Fetch) Cycle() {
     read.Len = fu.bw
     fu.Send(MEM_IN_1, read)
     bytes := fu.Recv(MEM_OUT_1).([]byte)
-    insns := make([]InsIn, fu.bw / 4)
+    insns := make([]InsIn, 0)
 
     // Turn bytes into InsIn objects
+    if fu.hitControl {
+      fu.current = insns
+      continue
+    }
     for i := 0; i < len(bytes); i += 4 {
-      insns[i] = InsIn{}
-      insns[i].Tag = fu.tag
-      insns[i].Ip = fu.ip + i * 4
-      insns[i].Code = bytes[i]
-      insns[i].RawOp1 = bytes[i + 1]
-      insns[i].RawOp2 = bytes[i + 2]
-      insns[i].RawOp3 = bytes[i + 3]
+      insin := InsIn{}
+      insin.Tag = fu.tag
+      insin.Ip = fu.ip + i * 4
+      insin.Code = bytes[i]
+      insin.RawOp1 = bytes[i + 1]
+      insin.RawOp2 = bytes[i + 2]
+      insin.RawOp3 = bytes[i + 3]
 
+      insns = append(insns, insin)
       fu.tag++
+      fu.ip += fu.bw
+      if t, _ := fu.is.InsIdDecode(insin.Code); t.Ins_type == ins.TYPE_CONTROL {
+        fu.hitControl = true
+        // We hit a control instruction, break
+        break
+      }
     }
     fu.current = insns
-    fu.ip += fu.bw
 
   }
 }
