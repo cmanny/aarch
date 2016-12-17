@@ -30,9 +30,9 @@ func (du *Decode) Cycle() {
     du.next = du.Recv(PIPE_DECODE_IN)
 
     // Decode instructions
-    for _, insn := range du.current.([]InsIn) {
+    for i, _ := range du.current.([]InsIn) {
       //fmt.Println(insn)
-      if insn == insn {}
+      if i > 0{}
     }
 
   }

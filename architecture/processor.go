@@ -81,12 +81,12 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   /* RS */
 
   p.rs = &comp.ReservationStation{}
-  p.rs.Init()
+  p.rs.Init(is)
 
   /* ROB */
 
   p.rb = &comp.ReorderBuffer{}
-  p.rb.Init()
+  p.rb.Init(is)
 
   /* BP */
 

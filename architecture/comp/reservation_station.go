@@ -3,10 +3,13 @@ package comp
 import (
   "fmt"
   "container/list"
+
+  "github.com/cmanny/aarch/architecture/ins"
 )
 
 type ReservationStation struct {
   Communicator
+  is* ins.InstructionSet
 
   queue *list.List
 
@@ -18,8 +21,10 @@ type ReservationStation struct {
 
 }
 
-func (rs* ReservationStation) Init() {
+func (rs* ReservationStation) Init(is *ins.InstructionSet) {
   rs.InitComms()
+  rs.queue = list.New()
+  rs.is = is
 }
 
 func (rs* ReservationStation) Data() interface{} {
@@ -39,13 +44,10 @@ func (rs* ReservationStation) Cycle() {
     // rs.Send(PIPE_MEMORY_IN, rs.muShelf)
     // rs.Send(PIPE_CONTROL_IN, rs.cuShelf)
 
-    in := rs.Recv(PIPE_RS_IN).(*list.List)
-    if in.Len() > 0 {}
-    get := in.Back()
-    if get != nil {
-      fmt.Println(get.Value)
-    }
-    //fmt.Println(in)
+    // Get new instructions from ROB
+    entryList := rs.Recv(PIPE_RS_IN).(*list.List)
+    rs.queue.PushBackList(entryList)
+    fmt.Println(rs.queue.Front())
 
     /* Send out all shelving buffers */
 

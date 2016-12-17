@@ -3,6 +3,7 @@ package comp
 import (
   //"fmt"
   "container/list"
+  "github.com/cmanny/aarch/architecture/ins"
 )
 
 const (
@@ -18,15 +19,17 @@ type BufferEntry struct {
 
 type ReorderBuffer struct {
   Communicator
+  is *ins.InstructionSet
 
   buffer *list.List
   decoded *list.List
 }
 
-func (rb* ReorderBuffer) Init() {
+func (rb* ReorderBuffer) Init(is *ins.InstructionSet) {
   rb.InitComms()
   rb.buffer = list.New()
   rb.decoded = list.New()
+  rb.is = is
 }
 
 func (rb* ReorderBuffer) Data() interface{} {

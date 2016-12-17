@@ -26,7 +26,7 @@ func (fu *Fetch) Init(is *ins.InstructionSet) {
   fu.hitControl = false
 
   fu.current = make([]InsIn, 0)
-  fu.bw = 4
+  fu.bw = 16
 }
 
 func (fu *Fetch) Data() interface{} {
@@ -59,7 +59,7 @@ func (fu *Fetch) Cycle() {
     for i := 0; i < len(bytes); i += 4 {
       insin := InsIn{}
       insin.Tag = fu.tag
-      insin.Ip = fu.ip + i * 4
+      insin.Ip = fu.ip
       insin.Code = bytes[i]
       insin.RawOp1 = bytes[i + 1]
       insin.RawOp2 = bytes[i + 2]
@@ -67,7 +67,7 @@ func (fu *Fetch) Cycle() {
 
       insns = append(insns, insin)
       fu.tag++
-      fu.ip += fu.bw
+      fu.ip += 4
       if t, _ := fu.is.InsIdDecode(insin.Code); t.Ins_type == ins.TYPE_CONTROL {
         fu.hitControl = true
         // We hit a control instruction, break
