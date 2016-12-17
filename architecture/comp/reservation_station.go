@@ -1,9 +1,14 @@
 package comp
 
+import (
+  "fmt"
+  "container/list"
+)
+
 type ReservationStation struct {
   Communicator
 
-  queue []InsIn
+  queue *list.List
 
 
   au1Shelf InsIn
@@ -34,8 +39,12 @@ func (rs* ReservationStation) Cycle() {
     // rs.Send(PIPE_MEMORY_IN, rs.muShelf)
     // rs.Send(PIPE_CONTROL_IN, rs.cuShelf)
 
-    in := rs.Recv(PIPE_RS_IN).([]InsIn)
-    if len(in) > 0 {}
+    in := rs.Recv(PIPE_RS_IN).(*list.List)
+    if in.Len() > 0 {}
+    get := in.Back()
+    if get != nil {
+      fmt.Println(get.Value)
+    }
     //fmt.Println(in)
 
     /* Send out all shelving buffers */

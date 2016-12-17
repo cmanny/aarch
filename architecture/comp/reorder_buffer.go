@@ -1,7 +1,7 @@
 package comp
 
 import (
-  "fmt"
+  //"fmt"
   "container/list"
 )
 
@@ -20,13 +20,13 @@ type ReorderBuffer struct {
   Communicator
 
   buffer *list.List
-  decoded []InsIn
+  decoded *list.List
 }
 
 func (rb* ReorderBuffer) Init() {
   rb.InitComms()
   rb.buffer = list.New()
-  rb.decoded = make([]InsIn, 0)
+  rb.decoded = list.New()
 }
 
 func (rb* ReorderBuffer) Data() interface{} {
@@ -41,15 +41,20 @@ func (rb* ReorderBuffer) Cycle() {
   for {
     rb.Recv(CYCLE)
     rb.Send(PIPE_RS_IN, rb.decoded)
-    rb.decoded = rb.Recv(PIPE_DECODE_OUT).([]InsIn)
+    decoded := rb.Recv(PIPE_DECODE_OUT).([]InsIn)
 
-    for _, in := range rb.decoded {
+    entryList := list.New()
+    rsList := list.New()
+
+    for _, in := range decoded {
       entry := BufferEntry{}
       entry.state = RB_ISSUED
       entry.in = in
 
-      rb.buffer.PushBack(entry)
+      entryList.PushBack(entry)
+      rsList.PushBack(in)
     }
-    fmt.Println(rb.buffer)
+    rb.buffer.PushBackList(entryList)
+    rb.decoded = rsList
   }
 }
