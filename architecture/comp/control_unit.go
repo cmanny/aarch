@@ -25,7 +25,10 @@ func (cu *ControlUnit) State() string {
 func (cu *ControlUnit) Cycle() {
   for {
     cu.Recv(CYCLE)
+    cu.current = cu.next
+    cu.Send(PIPE_CONTROL_OUT, cu.current)
     in := cu.Recv(PIPE_CONTROL_IN).(InsIn)
+    
     out := in
     out.Result = out.Ip
     switch {
@@ -74,6 +77,6 @@ func (cu *ControlUnit) Cycle() {
       default:
     }
 
-    cu.Send(PIPE_CONTROL_OUT, out)
+    cu.next = out
   }
 }

@@ -23,12 +23,13 @@ func (mu *MemoryUnit) State() string {
 }
 
 func (mu *MemoryUnit) Cycle() {
-  
+
   for {
     mu.Recv(CYCLE)
-
-
+    mu.current = mu.next
+    mu.Send(PIPE_MEMORY_OUT, mu.current)
     in := mu.Recv(PIPE_MEMORY_IN).(InsIn)
+    
     out := in
     switch {
       case in.Code == ins.MOV || in.Code == ins.MOVI:
@@ -50,6 +51,7 @@ func (mu *MemoryUnit) Cycle() {
         mu.Send(MEM_IN_2, memOp)
     }
 
-    mu.Send(PIPE_MEMORY_OUT, out)
+    mu.next = out
+
   }
 }

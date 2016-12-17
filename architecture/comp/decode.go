@@ -25,15 +25,14 @@ func (du *Decode) State() string {
 func (du *Decode) Cycle() {
   for {
     du.Recv(CYCLE)
-    //du.Send(PIPE_RS_IN, du.current)
-
     du.current = du.next
+    du.Send(PIPE_RS_IN, du.current)
+    du.next = du.Recv(PIPE_DECODE_IN)
 
     // Decode instructions
     for _, insn := range du.current.([]InsIn) {
       fmt.Println(insn)
     }
 
-    du.next = du.Recv(PIPE_DECODE_IN)
   }
 }

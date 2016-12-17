@@ -30,8 +30,11 @@ func (au *ArithmeticUnit) State() string {
 func (au *ArithmeticUnit) Cycle() {
   for {
     au.Recv(CYCLE)
-
+    au.current = au.next
+    au.Send(PIPE_ARITH_OUT, au.current)
     in := au.Recv(PIPE_ARITH_IN).(InsIn)
+
+
     out := in
     switch {
       case in.Code == ins.MUL || in.Code == ins.MULI:
@@ -57,7 +60,7 @@ func (au *ArithmeticUnit) Cycle() {
           out.Result = CMP_GREATER_THAN
         }
     }
+    au.next = out
 
-    au.Send(PIPE_ARITH_OUT, out)
   }
 }
