@@ -74,6 +74,19 @@ func (rs *ReservationStation) UpdatePhysicalRegister(tag int, value int) {
   rs.physical[tag] = value
 }
 
+func (rs *ReservationStation) UpdateByPhysicalRegister(in InsIn) InsIn {
+  in.Op2Tag = rs.rename[in.RawOp2][0]
+  in.Op3Tag = rs.rename[in.RawOp3][0]
+  //Update by the latest known values
+  if val, ok := rs.physical[in.Op2Tag]; ok {
+    in.Op2 = val
+  }
+  if val, ok := rs.physical[in.Op3Tag]; ok {
+    in.Op3 = val
+  }
+  return in
+}
+
 
 //Instructions that need to prevent hazards use this
 func (rs *ReservationStation) TagDeps(tagger InsIn, next *list.Element) {
@@ -121,7 +134,7 @@ func (rs *ReservationStation) ResolveTags(tagger InsIn, next *list.Element) {
       updatedIns.Op2Valid = true
     }
     if updatedIns.Op3Tag == tag {
-      updatedIns.Op3 = tag
+      updatedIns.Op3 = result
       updatedIns.Op3Valid = true
     }
     next.Value = updatedIns
