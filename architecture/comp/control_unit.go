@@ -28,7 +28,7 @@ func (cu *ControlUnit) Cycle() {
     cu.current = cu.next
     cu.Send(PIPE_CONTROL_OUT, cu.current)
     in := cu.Recv(PIPE_CONTROL_IN).(InsIn)
-    
+
     out := in
     out.Result = out.Ip
     switch {
@@ -54,22 +54,22 @@ func (cu *ControlUnit) Cycle() {
         //lol
 
       case in.Code == ins.AJMP:
-        out.Result = in.Op2
+        out.Result = in.Op1
       case in.Code == ins.AJEQ:
         if in.Op2 == CMP_EQUAL {
-          out.Result = in.Op2
+          out.Result = in.Op1
         }
       case in.Code == ins.AJNE:
         if in.Op2 != CMP_EQUAL {
-          out.Result = in.Op2
+          out.Result = in.Op1
         }
       case in.Code == ins.AJL:
         if in.Op2 == CMP_LESS_THAN {
-          out.Result = in.Op2
+          out.Result = in.Op1
         }
       case in.Code == ins.AJG:
         if in.Op2 != CMP_GREATER_THAN {
-          out.Result = in.Op2
+          out.Result = in.Op1
         }
       case in.Code == ins.HALT:
         out.Result = -1 //Secret IP

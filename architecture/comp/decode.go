@@ -29,6 +29,8 @@ func (du *Decode) Cycle() {
     du.Send(PIPE_DECODE_OUT, du.current)
     du.next = du.Recv(PIPE_DECODE_IN)
 
+    //du.Send()
+
     // Decode instructions
     for i, _ := range du.current.([]InsIn) {
       //fmt.Println(insn)
