@@ -7,6 +7,12 @@ import (
   "github.com/cmanny/aarch/architecture/ins"
 )
 
+type Shelf struct {
+  In InsIn
+  Type int
+  Filled bool
+  ChanId int
+}
 
 type ReservationStation struct {
   Communicator
@@ -15,10 +21,12 @@ type ReservationStation struct {
   queue *list.List
 
 
-  au1Shelf InsIn
-  au2Shelf InsIn
-  cuShelf InsIn
-  muShelf InsIn
+  au1Shelf Shelf
+  au2Shelf Shelf
+  cuShelf Shelf
+  muShelf Shelf
+
+  shelves [4]*Shelf
 
 }
 
@@ -26,6 +34,12 @@ func (rs* ReservationStation) Init(is *ins.InstructionSet) {
   rs.InitComms()
   rs.queue = list.New()
   rs.is = is
+
+  rs.au1Shelf = Shelf{InsIn{}, ins.TYPE_ARITH, false, PIPE_ARITH_IN_1}
+  rs.au2Shelf = Shelf{InsIn{}, ins.TYPE_ARITH, false, PIPE_ARITH_IN_2}
+  rs.cuShelf = Shelf{InsIn{}, ins.TYPE_CONTROL, false, PIPE_CONTROL_IN}
+  rs.muShelf = Shelf{InsIn{}, ins.TYPE_MOVE, false, PIPE_MEMORY_IN}
+  rs.shelves = [4]*Shelf{&rs.au1Shelf, &rs.au2Shelf, &rs.cuShelf, &rs.muShelf}
 
 }
 
@@ -41,22 +55,47 @@ func (rs* ReservationStation) Cycle() {
   for {
     rs.Recv(CYCLE)
     /* Send all shelved values */
-    // rs.Send(PIPE_ARITH_IN_1, rs.au1Shelf)
-    // rs.Send(PIPE_ARITH_IN_2, rs.au1Shelf)
-    // rs.Send(PIPE_MEMORY_IN, rs.muShelf)
-    // rs.Send(PIPE_CONTROL_IN, rs.cuShelf)
+    for _, s := range rs.shelves {
+      in := InsIn{}
+      in.Tag = -1
+      if s.Filled {
+        in = s.In
+        s.Filled = false
+      }
+      //rs.Send(s.ChanId, in)
+    }
 
     // Get new instructions from ROB
     entryList := rs.Recv(PIPE_RS_IN).(*list.List)
+    updateList := make([]InsIn, 0)//rs.Recv(CDB_RS_OUT).([]InsIn)
 
-
+    //Combine new entries into RS list
     rs.queue.PushBackList(entryList)
-    fmt.Println(rs.queue.Front())
+    //Resolve tags from CDB
+    for _, in := range updateList {
+      rs.ResolveTags(in, rs.queue.Front())
+    }
 
-    /* Send out all shelving buffers */
-
-    /* Receive bypass and rob pass through */
-
+    //Look up inthe list and fill up shelves
+    next := rs.queue.Front()
+    for next != nil {
+      in := next.Value.(InsIn)
+      if in.Op2Valid && in.Op3Valid {
+        //We found a ready instruction
+        val, err := rs.is.InsIdDecode(in.Code);
+        if err != nil {
+          continue
+        }
+        for _, s := range rs.shelves {
+          if !s.Filled && s.Type == val.Ins_type {
+            s.In = in
+            fmt.Println("")
+            s.Filled = true
+          }
+        }
+      }
+      next = next.Next()
+    }
 
   }
 }

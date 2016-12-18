@@ -67,6 +67,7 @@ func (rb* ReorderBuffer) Cycle() {
       entry := BufferEntry{}
       entry.state = RB_ISSUED
       entry.in = in
+      fmt.Println(in)
 
       entryList.PushBack(entry)
       rsList.PushBack(in)
@@ -118,7 +119,6 @@ func (rb *ReorderBuffer) UpdateByTables(in InsIn) InsIn {
 
 //Instructions that need to prevent hazards use this
 func (rb *ReorderBuffer) TagDeps(tagger InsIn, next *list.Element) {
-  fmt.Println(tagger)
   regId := tagger.RawOp1
   tag := tagger.Tag
   if val, err := rb.is.InsIdDecode(tagger.Code);
