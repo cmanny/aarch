@@ -37,6 +37,9 @@ const (
   PIPE_ARITH_OUT_2
   PIPE_CONTROL_OUT
   PIPE_MEMORY_OUT
+
+  CDB_RS_OUT
+  CDB_RB_OUT
 )
 
 var Comps []*CompWrapper

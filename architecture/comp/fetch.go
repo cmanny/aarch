@@ -27,7 +27,6 @@ type Fetch struct {
 func (fu *Fetch) Init(is *ins.InstructionSet) {
   fu.InitComms()
   fu.ip = 0
-  fu.tag = 0
   fu.is = is
   fu.hitControl = false
 
@@ -64,7 +63,6 @@ func (fu *Fetch) Cycle() {
     }
     for i := 0; i < len(bytes); i += 4 {
       insin := InsIn{}
-      insin.Tag = fu.tag
       insin.Ip = fu.ip
       insin.Code = bytes[i]
       insin.RawOp1 = bytes[i + 1]
@@ -72,7 +70,6 @@ func (fu *Fetch) Cycle() {
       insin.RawOp3 = bytes[i + 3]
 
       insns = append(insns, insin)
-      fu.tag++
       fu.ip += 4
       if t, _ := fu.is.InsIdDecode(insin.Code); t.Ins_type == ins.TYPE_CONTROL {
         fu.hitControl = true
