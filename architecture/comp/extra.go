@@ -22,7 +22,7 @@ type InsIn struct {
   Op3Valid bool
 
   Valid bool
-  Speculative bool
+  FlowId int
 
   Result  int
 

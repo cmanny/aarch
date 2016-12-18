@@ -6,6 +6,12 @@ import (
   "github.com/cmanny/aarch/architecture/ins"
 )
 
+const (
+  SPECULATE_NONE = iota
+  SPECULATE_TAKEN
+  SPECULATE_NOT_TAKEN
+)
+
 type Fetch struct {
   Communicator
   PipelineData
