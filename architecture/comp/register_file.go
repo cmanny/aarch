@@ -8,19 +8,25 @@ import (
 const (
   REG_READ = iota
   REG_WRITE
+  REG_INVALIDATE
   REG_CLEAR
 )
 
+type RegData struct {
+  Id int
+  Value int
+  Tag int
+  Valid bool
+}
+
 type RegOp struct {
   Op int
-  Id int
-  Len int
-  Data [4]byte
+  Data RegData
 }
 
 type RegisterFile struct {
   Communicator
-  regs  [32][4]byte
+  regs  [32] RegData
   Flags int
 }
 
@@ -45,18 +51,28 @@ func (rf *RegisterFile) Cycle() {
 
   for {
     rf.Recv(CYCLE)
-
-    for i := 0; i < 5; i++ {
-      for _, chanPair := range chans {
-        ok, regOpIntf := rf.AsyncRecv(chanPair[0])
-        if ok {
-          regOp := regOpIntf.(RegOp)
+    for _, chanPair := range chans {
+      ok, regOpsIntf := rf.AsyncRecv(chanPair[0])
+      if ok {
+        regOps := regOpsIntf.([]RegOp)
+        returnBuf := make([]RegData, 0)
+        for _, regOp := range regOps {
           switch regOp.Op {
           case REG_READ:
-            rf.Send(chanPair[1], rf.regs[regOp.Id])
+            returnBuf = append(returnBuf, rf.regs[regOp.Data.Id])
           case REG_WRITE:
-            rf.regs[regOp.Id] = regOp.Data
+            rf.regs[regOp.Data.Id].Value = regOp.Data.Value
+            if rf.regs[regOp.Data.Id].Tag == regOp.Data.Tag {
+              rf.regs[regOp.Data.Id].Valid = true
+            }
+
+          case REG_INVALIDATE:
+            rf.regs[regOp.Data.Id].Valid = false
+            rf.regs[regOp.Data.Id].Tag = regOp.Data.Tag
           }
+        }
+        if len(returnBuf) > 0 {
+          rf.Send(chanPair[1], returnBuf)
         }
       }
     }
@@ -66,7 +82,7 @@ func (rf *RegisterFile) Cycle() {
 func (rf *RegisterFile) Contents() {
   var buffer bytes.Buffer
   for i := 0; i < 32; i++ {
-    buffer.WriteString("r" + fmt.Sprintf("%d", i) + ": " + fmt.Sprintf("%d", rf.regs[i]) + "\n")
+    buffer.WriteString("r" + fmt.Sprintf("%d", i) + ": " + fmt.Sprintf("%d", rf.regs[i].Value) + "\n")
   }
   fmt.Println(buffer.String())
 }
