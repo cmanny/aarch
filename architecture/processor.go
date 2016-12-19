@@ -243,7 +243,10 @@ func (p *Processor) Run() {
   }
 
   for {
+    // var input string
+    // fmt.Scanln(&input)
     p.numCycles++
+    fmt.Println(p.numCycles)
     for _, c := range comp.Comps {
       if !c.Obj.(comp.Communicatizer).AsyncSend(comp.CYCLE, 1) {
         //fmt.Println(fmt.Sprintf("%p did not receive\n", c.Obj))

@@ -121,6 +121,7 @@ func (rs *ReservationStation) ResolveTags(tagger InsIn, next *list.Element) {
   //Search up the chain for any tags to resolve
   for next != nil {
     //fmt.Println("Resolving tags")
+    //UsingFlowId()
     updatedIns := next.Value.(InsIn)
     if updatedIns.Op2Tag == tag {
       updatedIns.Op2 = result

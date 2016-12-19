@@ -1,5 +1,5 @@
 package comp
-
+//This is now in fetch
 type BranchPredictor struct {
   Communicator
 }

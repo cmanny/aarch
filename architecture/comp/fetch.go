@@ -35,6 +35,8 @@ type Fetch struct {
   ip int
   tag int
   bw int
+
+  branch map[int]int
 }
 
 func (fu *Fetch) Init(is *ins.InstructionSet) {
@@ -42,6 +44,8 @@ func (fu *Fetch) Init(is *ins.InstructionSet) {
   fu.ip = 0
   fu.is = is
   fu.hitControl = false
+  fu.branch = make(map[int]int)
+
 
   fu.current = make([]InsIn, 0)
   fu.bw = 16
@@ -64,6 +68,7 @@ func (fu *Fetch) Cycle() {
     switch hint.op {
     case HINT_STALL:
       fu.current = make([]InsIn, 0)
+      //accumulator += stall
       continue
     case HINT_BRANCH_TAKEN:
       fu.ip = hint.in.Result

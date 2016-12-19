@@ -1,8 +1,8 @@
 .code
   movi a 0
   movi b 1
-  movi c 20
-  jmp .simple
+  movi c 40
+  jmp .complex
 .simple
   mov  d b
   add  b b a
