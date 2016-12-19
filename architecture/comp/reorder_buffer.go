@@ -77,6 +77,10 @@ func (rb* ReorderBuffer) Cycle() {
     rb.hint = FlowHint{}
     rb.hint.op = HINT_CONTINUE
 
+    if rb.freeNames.Len() < 12 {
+      rb.hint.op = HINT_STALL
+    }
+
     for _, in := range updateList {
       if 0 < in.Tag && in.Tag < 40 {
         //fmt.Println(rb.freeNames.Len())
@@ -145,6 +149,7 @@ func (rb* ReorderBuffer) Cycle() {
     }
     rb.decoded = rsList
   }
+
 }
 
 func (rb *ReorderBuffer) UpdateNamingTable(tagger InsIn, tag int) {

@@ -1,12 +1,13 @@
 .code
   movi a 0
   movi b 1
-  movi c 10
-  jmp .complex
+  movi c 20
+  jmp .simple
 .simple
   mov  d b
   add  b b a
   mov  a d
+  mov  w b
   subi c c 1
   cmpi d c 0
   jne .simple d
@@ -16,6 +17,7 @@
   xor  b a b
   xor  a a b
   add  b a b
+  mov  w b
   subi c c 1
   cmpi d c 0
   jne .complex d

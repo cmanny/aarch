@@ -252,7 +252,7 @@ func (p *Processor) Run() {
       }
 
     }
-    time.Sleep(time.Millisecond * 100)
+    time.Sleep(time.Millisecond * 1)
 
     if p.exit {
       return

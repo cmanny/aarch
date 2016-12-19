@@ -2,6 +2,7 @@ package comp
 
 import (
   "github.com/cmanny/aarch/architecture/ins"
+  "fmt"
 )
 
 type ControlUnit struct {
@@ -30,8 +31,9 @@ func (cu *ControlUnit) Cycle() {
     cu.Send(PIPE_CONTROL_OUT, cu.current)
     in := cu.Recv(PIPE_CONTROL_IN).(InsIn)
 
+
     out := in
-    out.Result = out.Ip
+    out.Result = out.Ip + 4
     switch {
       case in.Code == ins.JMP:
         out.Result = in.Ip + in.Op1 * 4
@@ -73,7 +75,11 @@ func (cu *ControlUnit) Cycle() {
           out.Result = in.Op1
         }
       case in.Code == ins.HALT:
-        out.Result = -1 //Secret IP
+        if in.Tag != -1 {
+          out.Result = -1 //Secret IP
+          fmt.Println("halt")
+          fmt.Println(out)
+        }
 
       default:
     }

@@ -63,6 +63,7 @@ func (fu *Fetch) Cycle() {
     //fmt.Println("Sending fetched data")
     switch hint.op {
     case HINT_STALL:
+      fu.current = make([]InsIn, 0)
       continue
     case HINT_BRANCH_TAKEN:
       fu.ip = hint.in.Result
