@@ -11,7 +11,8 @@ type ControlUnit struct {
 
 func (cu *ControlUnit) Init() {
   cu.InitComms()
-
+  cu.next = InsIn{}
+  cu.current = InsIn{}
 }
 
 func (cu *ControlUnit) Data() interface{} {

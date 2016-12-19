@@ -2,6 +2,7 @@ package comp
 
 import (
   "github.com/cmanny/aarch/architecture/ins"
+  //"fmt"
 )
 
 const (
@@ -17,6 +18,8 @@ type ArithmeticUnit struct {
 
 func (au *ArithmeticUnit) Init() {
   au.InitComms()
+  au.next = InsIn{}
+  au.current = InsIn{}
 }
 
 func (au *ArithmeticUnit) Data() interface{} {
@@ -60,6 +63,7 @@ func (au *ArithmeticUnit) Cycle() {
           out.Result = CMP_GREATER_THAN
         }
     }
+    //fmt.Println(out.Result)
     au.next = out
 
   }

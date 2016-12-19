@@ -3,6 +3,7 @@ package comp
 import (
   "github.com/cmanny/aarch/architecture/ins"
   "encoding/binary"
+  "fmt"
 )
 
 type MemoryUnit struct {
@@ -12,6 +13,8 @@ type MemoryUnit struct {
 
 func (mu *MemoryUnit) Init() {
   mu.InitComms()
+  mu.next = InsIn{}
+  mu.current = InsIn{}
 }
 
 func (mu *MemoryUnit) Data() interface{} {
@@ -29,11 +32,14 @@ func (mu *MemoryUnit) Cycle() {
     mu.current = mu.next
     mu.Send(PIPE_MEMORY_OUT, mu.current)
     in := mu.Recv(PIPE_MEMORY_IN).(InsIn)
-    
+
     out := in
+    fmt.Println("")
     switch {
       case in.Code == ins.MOV || in.Code == ins.MOVI:
+        //fmt.Println("Found movi")
         out.Result = in.Op2
+        fmt.Println(in)
       case in.Code == ins.LDR:
         memOp := MemOp{}
         memOp.Op = MEM_READ
@@ -50,7 +56,7 @@ func (mu *MemoryUnit) Cycle() {
         binary.PutVarint(memOp.Data, int64(in.Op2))
         mu.Send(MEM_IN_2, memOp)
     }
-
+    //fmt.Println(out.Result)
     mu.next = out
 
   }

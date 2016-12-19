@@ -62,12 +62,13 @@ func (rs* ReservationStation) Cycle() {
         in = s.In
         s.Filled = false
       }
-      //rs.Send(s.ChanId, in)
+      rs.Send(s.ChanId, in)
     }
 
     // Get new instructions from ROB
     entryList := rs.Recv(PIPE_RS_IN).(*list.List)
-    updateList := make([]InsIn, 0)//rs.Recv(CDB_RS_OUT).([]InsIn)
+    //fmt.Println(entryList)
+    updateList := rs.Recv(CDB_RS_OUT).([]InsIn)
 
     //Combine new entries into RS list
     rs.queue.PushBackList(entryList)
@@ -80,7 +81,9 @@ func (rs* ReservationStation) Cycle() {
     next := rs.queue.Front()
     for next != nil {
       in := next.Value.(InsIn)
+      fmt.Println(in)
       if in.Op2Valid && in.Op3Valid {
+        //fmt.Println("Found valid")
         //We found a ready instruction
         val, err := rs.is.InsIdDecode(in.Code);
         if err != nil {
@@ -88,8 +91,8 @@ func (rs* ReservationStation) Cycle() {
         }
         for _, s := range rs.shelves {
           if !s.Filled && s.Type == val.Ins_type {
+            rs.queue.Remove(next)
             s.In = in
-            fmt.Println("")
             s.Filled = true
           }
         }
@@ -113,6 +116,7 @@ func (rs *ReservationStation) ResolveTags(tagger InsIn, next *list.Element) {
 
   //Search up the chain for any tags to resolve
   for next != nil {
+    //fmt.Println("Resolving tags")
     updatedIns := next.Value.(InsIn)
     if updatedIns.Op2Tag == tag {
       updatedIns.Op2 = result
@@ -123,5 +127,6 @@ func (rs *ReservationStation) ResolveTags(tagger InsIn, next *list.Element) {
       updatedIns.Op3Valid = true
     }
     next.Value = updatedIns
+    next = next.Next()
   }
 }

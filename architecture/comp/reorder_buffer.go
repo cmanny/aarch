@@ -17,6 +17,11 @@ type BufferEntry struct {
   state int
 }
 
+type PhysicalRegister struct {
+  Value int
+  Valid bool
+}
+
 type ReorderBuffer struct {
   Communicator
   is *ins.InstructionSet
@@ -26,7 +31,7 @@ type ReorderBuffer struct {
   freeNames *list.List
 
   rename [8][3]int
-  physical [40]int
+  physical [40]PhysicalRegister
 }
 
 func (rb* ReorderBuffer) Init(is *ins.InstructionSet) {
@@ -37,8 +42,9 @@ func (rb* ReorderBuffer) Init(is *ins.InstructionSet) {
 
   rb.freeNames = list.New()
   //Fill up free renaming buffer
-  for i := 0; i < 64; i++ {
+  for i := 1; i < 40; i++ {
     rb.freeNames.PushBack(i)
+    rb.physical[i].Valid = true
   }
 
 
@@ -57,6 +63,16 @@ func (rb* ReorderBuffer) Cycle() {
     rb.Recv(CYCLE)
     rb.Send(PIPE_RS_IN, rb.decoded)
     decoded := rb.Recv(PIPE_DECODE_OUT).([]InsIn)
+    updateList := rb.Recv(CDB_RB_OUT).([]InsIn)
+
+    for _, in := range updateList {
+      if 0 < in.Tag && in.Tag < 40 {
+        rb.UpdatePhysicalRegister(in.Tag, in.Result)
+        fmt.Println(rb.physical)
+      }
+    }
+
+    //fmt.Println("re")
 
     entryList := list.New()
     rsList := list.New()
@@ -67,7 +83,7 @@ func (rb* ReorderBuffer) Cycle() {
       entry := BufferEntry{}
       entry.state = RB_ISSUED
       entry.in = in
-      fmt.Println(in)
+      //fmt.Println(in)
 
       entryList.PushBack(entry)
       rsList.PushBack(in)
@@ -78,12 +94,14 @@ func (rb* ReorderBuffer) Cycle() {
     next := rsList.Front()
     for next != nil {
       next.Value = rb.UpdateByTables(next.Value.(InsIn))
+      //fmt.Println(next)
       next = next.Next()
     }
     //Then tag any new dependencies
     next = rsList.Front()
     for next != nil {
       rb.TagDeps(next.Value.(InsIn), next.Next())
+      //fmt.Println(next.Value)
       next = next.Next()
     }
     rb.decoded = rsList
@@ -94,8 +112,10 @@ func (rb *ReorderBuffer) UpdateNamingTable(tagger InsIn, tag int) {
   rb.rename[tagger.RawOp1] = [3]int{tag, tag, tag}
 }
 
+// It is assumed that when a physical register is fulfilled, it is then valid
 func (rb *ReorderBuffer) UpdatePhysicalRegister(tag int, value int) {
-  rb.physical[tag] = value
+  rb.physical[tag].Value = value
+  rb.physical[tag].Valid = true
 }
 
 func (rb *ReorderBuffer) UpdateByTables(in InsIn) InsIn {
@@ -107,11 +127,27 @@ func (rb *ReorderBuffer) UpdateByTables(in InsIn) InsIn {
   //Update by the latest known values
   if op2type == ins.OP_REGISTER {
     in.Op2Tag = rb.rename[in.RawOp2][0]
-    in.Op2 = rb.physical[in.Op2Tag]
+    in.Op2 = rb.physical[in.Op2Tag].Value
+    in.Op2Valid = rb.physical[in.Op2Tag].Valid
+  }
+  if op2type == ins.OP_CONSTANT_8 {
+    in.Op2 = int(in.RawOp2)
+    in.Op2Valid = true
   }
   if op3type == ins.OP_REGISTER {
     in.Op3Tag = rb.rename[in.RawOp3][0]
-    in.Op3 = rb.physical[in.Op3Tag]
+    in.Op3 = rb.physical[in.Op3Tag].Value
+    in.Op3Valid = rb.physical[in.Op3Tag].Valid
+  }
+  if op3type == ins.OP_CONSTANT_8 {
+    in.Op3 = int(in.RawOp3)
+    in.Op3Valid = true
+  }
+  if op2type == ins.OP_EMPTY {
+    in.Op2Valid = true
+  }
+  if op3type == ins.OP_EMPTY {
+    in.Op3Valid = true
   }
   return in
 }

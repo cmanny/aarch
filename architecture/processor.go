@@ -39,6 +39,8 @@ type Processor struct {
   bp *comp.BranchPredictor
   rb *comp.ReorderBuffer
 
+  cdb *comp.CommonDataBus
+
   rf *comp.RegisterFile
 }
 
@@ -118,6 +120,9 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   p.rf = &comp.RegisterFile{}
   p.rf.Init()
 
+  p.cdb = &comp.CommonDataBus{}
+  p.cdb.Init()
+
 
 
 
@@ -163,6 +168,10 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
       Name: "MemoryUnit",
       Obj:  p.mu,
     },
+    &comp.CompWrapper{
+      Name: "CommonDataBus",
+      Obj:  p.cdb,
+    },
   )
 
   /* Joining components (important (do not forget))
@@ -189,10 +198,13 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   comp.Join(p.rs, p.cu, comp.PIPE_CONTROL_IN, 1)
   comp.Join(p.rs, p.mu, comp.PIPE_MEMORY_IN, 1)
 
-  comp.JoinDifferent(p.rb, comp.PIPE_ARITH_OUT_1, p.au1, comp.PIPE_ARITH_OUT, 1)
-  comp.JoinDifferent(p.rb, comp.PIPE_ARITH_OUT_2, p.au2, comp.PIPE_ARITH_OUT, 1)
-  comp.Join(p.rb, p.cu, comp.PIPE_CONTROL_OUT, 1)
-  comp.Join(p.rb, p.mu, comp.PIPE_MEMORY_OUT, 1)
+  comp.JoinDifferent(p.cdb, comp.PIPE_ARITH_OUT_1, p.au1, comp.PIPE_ARITH_OUT, 1)
+  comp.JoinDifferent(p.cdb, comp.PIPE_ARITH_OUT_2, p.au2, comp.PIPE_ARITH_OUT, 1)
+  comp.Join(p.cdb, p.cu, comp.PIPE_CONTROL_OUT, 1)
+  comp.Join(p.cdb, p.mu, comp.PIPE_MEMORY_OUT, 1)
+
+  comp.Join(p.cdb, p.rs, comp.CDB_RS_OUT, 1)
+  comp.Join(p.cdb, p.rb, comp.CDB_RB_OUT, 1)
 
 
 }
