@@ -17,11 +17,9 @@ type InsIn struct {
   Op2Tag int
   Op3Tag int
 
-  Op1Valid bool
   Op2Valid bool
   Op3Valid bool
 
-  Valid bool
   FlowId int
 
   Result  int

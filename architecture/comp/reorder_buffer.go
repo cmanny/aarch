@@ -1,5 +1,6 @@
 package comp
 
+
 import (
   "fmt"
   "container/list"
@@ -42,9 +43,13 @@ func (rb* ReorderBuffer) Init(is *ins.InstructionSet) {
 
   rb.freeNames = list.New()
   //Fill up free renaming buffer
+  rb.physical[0].Valid = true
   for i := 1; i < 40; i++ {
     rb.freeNames.PushBack(i)
     rb.physical[i].Valid = true
+  }
+  for i:= 0; i < 8; i ++{
+    rb.rename[i] = [3]int{0, 0, 0}
   }
 
 
@@ -65,10 +70,14 @@ func (rb* ReorderBuffer) Cycle() {
     decoded := rb.Recv(PIPE_DECODE_OUT).([]InsIn)
     updateList := rb.Recv(CDB_RB_OUT).([]InsIn)
 
+    fmt.Println(updateList)
     for _, in := range updateList {
+
       if 0 < in.Tag && in.Tag < 40 {
-        rb.UpdatePhysicalRegister(in.Tag, in.Result)
-        fmt.Println(rb.physical)
+        val, _ := rb.is.InsIdDecode(in.Code)
+        if val.Ins_type != ins.TYPE_CONTROL {
+          rb.UpdatePhysicalRegister(in.Tag, in.Result, true)
+        }
       }
     }
 
@@ -79,7 +88,12 @@ func (rb* ReorderBuffer) Cycle() {
 
     for _, in := range decoded {
       //For each instruction arriving, give a buffer entry and tag
+
       in.Tag = rb.freeNames.Remove(rb.freeNames.Front()).(int)
+      val, _ := rb.is.InsIdDecode(in.Code)
+      if val.Ins_type != ins.TYPE_CONTROL {
+        rb.UpdatePhysicalRegister(in.Tag, -1, false)
+      }
       entry := BufferEntry{}
       entry.state = RB_ISSUED
       entry.in = in
@@ -94,14 +108,13 @@ func (rb* ReorderBuffer) Cycle() {
     next := rsList.Front()
     for next != nil {
       next.Value = rb.UpdateByTables(next.Value.(InsIn))
-      //fmt.Println(next)
       next = next.Next()
     }
     //Then tag any new dependencies
     next = rsList.Front()
     for next != nil {
-      rb.TagDeps(next.Value.(InsIn), next.Next())
       //fmt.Println(next.Value)
+      rb.TagDeps(next.Value.(InsIn), next.Next())
       next = next.Next()
     }
     rb.decoded = rsList
@@ -113,10 +126,12 @@ func (rb *ReorderBuffer) UpdateNamingTable(tagger InsIn, tag int) {
 }
 
 // It is assumed that when a physical register is fulfilled, it is then valid
-func (rb *ReorderBuffer) UpdatePhysicalRegister(tag int, value int) {
+func (rb *ReorderBuffer) UpdatePhysicalRegister(tag int, value int, validity bool) {
   rb.physical[tag].Value = value
-  rb.physical[tag].Valid = true
+  rb.physical[tag].Valid = validity
 }
+
+
 
 func (rb *ReorderBuffer) UpdateByTables(in InsIn) InsIn {
   op3type, op2type := -1, -1
@@ -124,6 +139,8 @@ func (rb *ReorderBuffer) UpdateByTables(in InsIn) InsIn {
     op2type = val.Op2
     op3type = val.Op3
   }
+
+  in.Op1 = int(int8(in.RawOp1))
   //Update by the latest known values
   if op2type == ins.OP_REGISTER {
     in.Op2Tag = rb.rename[in.RawOp2][0]
@@ -165,11 +182,17 @@ func (rb *ReorderBuffer) TagDeps(tagger InsIn, next *list.Element) {
   //Search up the chain for any tags to apply
   for next != nil {
     updatedIns := next.Value.(InsIn)
-    if regId == updatedIns.RawOp2 {
+    insInfo, _ := rb.is.InsIdDecode(updatedIns.Code)
+    op2Type := insInfo.Op2
+    op3Type := insInfo.Op3
+    if updatedIns.Tag == tagger.Tag {
+      break
+    }
+    if regId == updatedIns.RawOp2 && op2Type == ins.OP_REGISTER {
       updatedIns.Op2Tag = tag
       updatedIns.Op2Valid = false
     }
-    if regId == updatedIns.RawOp3 {
+    if regId == updatedIns.RawOp3 && op3Type == ins.OP_REGISTER{
       updatedIns.Op3Tag = tag
       updatedIns.Op3Valid = false
     }

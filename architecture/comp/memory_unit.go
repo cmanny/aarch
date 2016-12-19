@@ -34,7 +34,6 @@ func (mu *MemoryUnit) Cycle() {
     in := mu.Recv(PIPE_MEMORY_IN).(InsIn)
 
     out := in
-    fmt.Println("")
     switch {
       case in.Code == ins.MOV || in.Code == ins.MOVI:
         //fmt.Println("Found movi")

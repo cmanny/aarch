@@ -61,6 +61,7 @@ func (rs* ReservationStation) Cycle() {
       if s.Filled {
         in = s.In
         s.Filled = false
+        fmt.Println("Filled!")
       }
       rs.Send(s.ChanId, in)
     }
@@ -76,12 +77,14 @@ func (rs* ReservationStation) Cycle() {
     for _, in := range updateList {
       rs.ResolveTags(in, rs.queue.Front())
     }
+    fmt.Println(rs.queue.Len())
 
     //Look up inthe list and fill up shelves
     next := rs.queue.Front()
     for next != nil {
+      fmt.Println(next.Value)
       in := next.Value.(InsIn)
-      fmt.Println(in)
+      //fmt.Println(in)
       if in.Op2Valid && in.Op3Valid {
         //fmt.Println("Found valid")
         //We found a ready instruction
@@ -94,6 +97,7 @@ func (rs* ReservationStation) Cycle() {
             rs.queue.Remove(next)
             s.In = in
             s.Filled = true
+            break
           }
         }
       }

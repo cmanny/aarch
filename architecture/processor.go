@@ -19,6 +19,7 @@ type Processor struct {
   cycle chan int
 
   ip int
+  numCycles int
 
   is *ins.InstructionSet
 
@@ -70,6 +71,7 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   p.InitComms()
   p.is = is
   p.cycle = cycle
+  p.numCycles = 0
 
   /* Init all sub components */
   p.mem = mem
@@ -239,6 +241,7 @@ func (p *Processor) Run() {
   }
 
   for {
+    p.numCycles++
     for _, c := range comp.Comps {
       if !c.Obj.(comp.Communicatizer).AsyncSend(comp.CYCLE, 1) {
         //fmt.Println(fmt.Sprintf("%p did not receive\n", c.Obj))
@@ -247,7 +250,9 @@ func (p *Processor) Run() {
       }
 
     }
-    time.Sleep(time.Millisecond * 10)
+    time.Sleep(time.Millisecond * 100)
+    fmt.Println("cycle")
+    fmt.Println(p.numCycles)
 
     if p.exit {
       return

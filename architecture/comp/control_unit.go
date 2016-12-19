@@ -2,6 +2,7 @@ package comp
 
 import (
   "github.com/cmanny/aarch/architecture/ins"
+  "fmt"
 )
 
 type ControlUnit struct {
@@ -42,6 +43,7 @@ func (cu *ControlUnit) Cycle() {
       case in.Code == ins.JNE:
         if in.Op2 != CMP_EQUAL {
           out.Result = in.Ip + in.Op1 * 4
+          fmt.Println("Not equal")
         }
       case in.Code == ins.JL:
         if in.Op2 == CMP_LESS_THAN {
