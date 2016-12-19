@@ -26,10 +26,12 @@ type PhysicalRegister struct {
 type ReorderBuffer struct {
   Communicator
   is *ins.InstructionSet
+  hint FlowHint
 
   buffer *list.List
   decoded *list.List
   freeNames *list.List
+  toFree []InsIn
 
   rename [8][3]int
   physical [40]PhysicalRegister
@@ -42,6 +44,7 @@ func (rb* ReorderBuffer) Init(is *ins.InstructionSet) {
   rb.is = is
 
   rb.freeNames = list.New()
+  rb.toFree = make([]InsIn, 0)
   //Fill up free renaming buffer
   rb.physical[0].Valid = true
   for i := 1; i < 40; i++ {
@@ -66,20 +69,41 @@ func (rb* ReorderBuffer) State() string {
 func (rb* ReorderBuffer) Cycle() {
   for {
     rb.Recv(CYCLE)
+    rb.Send(PIPE_FETCH_IN, rb.hint)
     rb.Send(PIPE_RS_IN, rb.decoded)
     decoded := rb.Recv(PIPE_DECODE_OUT).([]InsIn)
     updateList := rb.Recv(CDB_RB_OUT).([]InsIn)
 
+    rb.hint = FlowHint{}
+    rb.hint.op = HINT_CONTINUE
+
     for _, in := range updateList {
       if 0 < in.Tag && in.Tag < 40 {
+        //fmt.Println(rb.freeNames.Len())
         val, _ := rb.is.InsIdDecode(in.Code)
         fmt.Println(in)
         if val.Ins_type != ins.TYPE_CONTROL {
           rb.UpdatePhysicalRegister(in.Tag, in.Result, true)
-          if rb.rename[in.RawOp1][0] != in.Tag {
-            rb.freeNames.PushBack(in.Tag)
+          rb.toFree = append(rb.toFree, in)
+        } else {
+          rb.hint = FlowHint{}
+          if in.Result == in.Ip + 4 {
+            rb.hint.op = HINT_BRANCH_NOT_TAKEN
+          } else {
+            rb.hint.op = HINT_BRANCH_TAKEN
           }
+          rb.hint.in = in
+          rb.freeNames.PushBack(in.Tag)
         }
+        rb.Finish(in.Tag)
+      }
+    }
+
+    for i := len(rb.toFree) - 1; i >= 0; i-- {
+      in := rb.toFree[i]
+      if rb.rename[in.RawOp1][0] != in.Tag {
+        rb.freeNames.PushBack(in.Tag)
+        rb.toFree = append(rb.toFree[:i], rb.toFree[i+1:]...)
       }
     }
 
@@ -205,4 +229,14 @@ func (rb *ReorderBuffer) TagDeps(tagger InsIn, next *list.Element) {
   //Update the naming table, it is not the responsibility of this function to make this
   //A latest valid name
   rb.UpdateNamingTable(tagger, tag)
+}
+
+func (rb *ReorderBuffer) Finish(tag int){
+  next := rb.buffer.Front()
+  val := next.Value.(BufferEntry)
+  if val.in.Tag == tag {
+    //Found it
+    val.state = RB_FINISHED
+    next.Value = val
+  }
 }

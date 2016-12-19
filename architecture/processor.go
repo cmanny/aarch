@@ -208,6 +208,8 @@ func (p *Processor) Init(is *ins.InstructionSet, mem *comp.Memory, cycle chan in
   comp.Join(p.cdb, p.rs, comp.CDB_RS_OUT, 1)
   comp.Join(p.cdb, p.rb, comp.CDB_RB_OUT, 1)
 
+  comp.Join(p.fu, p.rb, comp.PIPE_FETCH_IN, 1)
+
 
 }
 

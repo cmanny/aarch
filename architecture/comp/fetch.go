@@ -4,6 +4,7 @@ package comp
 
 import (
   "github.com/cmanny/aarch/architecture/ins"
+  "os"
 )
 
 const (
@@ -11,6 +12,18 @@ const (
   SPECULATE_TAKEN
   SPECULATE_NOT_TAKEN
 )
+
+const (
+  HINT_CONTINUE = iota
+  HINT_STALL
+  HINT_BRANCH_TAKEN
+  HINT_BRANCH_NOT_TAKEN
+)
+
+type FlowHint struct {
+  in InsIn
+  op int
+}
 
 type Fetch struct {
   Communicator
@@ -46,8 +59,21 @@ func (fu *Fetch) Cycle() {
   for {
     fu.Recv(CYCLE)
     fu.Send(PIPE_DECODE_IN, fu.current)
+    hint := fu.Recv(PIPE_FETCH_IN).(FlowHint)
     //fmt.Println("Sending fetched data")
-
+    switch hint.op {
+    case HINT_STALL:
+      continue
+    case HINT_BRANCH_TAKEN:
+      fu.ip = hint.in.Result
+      fu.hitControl = false
+    case HINT_BRANCH_NOT_TAKEN:
+      fu.ip = hint.in.Result
+      fu.hitControl = false
+    }
+    if fu.ip == -1 {
+      os.Exit(1)
+    }
     read := MemOp{}
     read.Op = MEM_READ
     read.Addr = fu.ip
