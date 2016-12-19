@@ -61,7 +61,6 @@ func (rs* ReservationStation) Cycle() {
       if s.Filled {
         in = s.In
         s.Filled = false
-        fmt.Println("Filled!")
       }
       rs.Send(s.ChanId, in)
     }
@@ -81,8 +80,8 @@ func (rs* ReservationStation) Cycle() {
 
     //Look up inthe list and fill up shelves
     next := rs.queue.Front()
+    toRemove := make([]*list.Element, 0)
     for next != nil {
-      fmt.Println(next.Value)
       in := next.Value.(InsIn)
       //fmt.Println(in)
       if in.Op2Valid && in.Op3Valid {
@@ -94,7 +93,7 @@ func (rs* ReservationStation) Cycle() {
         }
         for _, s := range rs.shelves {
           if !s.Filled && s.Type == val.Ins_type {
-            rs.queue.Remove(next)
+            toRemove = append(toRemove, next)
             s.In = in
             s.Filled = true
             break
@@ -102,6 +101,9 @@ func (rs* ReservationStation) Cycle() {
         }
       }
       next = next.Next()
+    }
+    for _, r := range toRemove {
+      rs.queue.Remove(r)
     }
 
   }

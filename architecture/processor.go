@@ -251,8 +251,6 @@ func (p *Processor) Run() {
 
     }
     time.Sleep(time.Millisecond * 100)
-    fmt.Println("cycle")
-    fmt.Println(p.numCycles)
 
     if p.exit {
       return
