@@ -12,6 +12,7 @@ import (
   "github.com/cmanny/aarch/web"
 )
 
+
 /**
   In the main function we create the highest level parts of the system and
   connect them together. The assembler may be used to compile the written
@@ -32,20 +33,22 @@ func main() {
 
   /* Init top level components */
 
+  cycle := make(chan int, 0)
+
   /* Architectural components */
   is := &ins.InstructionSet{}
   is.Init()
   mem := &comp.Memory{}
   mem.Init()
   p := &architecture.Processor{}
-  p.Init(is, mem)
+  p.Init(is, mem, cycle)
   as := &ins.Assembler{}
   as.Init(is)
 
   /* Visualisation components */
 
   serv := &server.Server{}
-  serv.Init("8080   ")
+  serv.Init("8080", cycle)
 
   /* Begin */
 

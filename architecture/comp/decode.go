@@ -1,22 +1,41 @@
 package comp
 
+//import "fmt"
+
+
 type Decode struct {
-	Communicator
+  Communicator
+  PipelineData
 }
 
-func (fu *Decode) Init() {
-	fu.InitComms()
-	fu.Inputs["reg_in"] = make(chan interface{}, 1)
-	fu.Outputs["reg_out"] = make(chan interface{}, 1)
+func (du *Decode) Init() {
+  du.InitComms()
+  du.current = make([]InsIn, 0)
+  du.next = make([]InsIn, 0)
 }
 
-func (fu *Decode) Data() interface{} {
-	return ""
+func (du *Decode) Data() interface{} {
+  return ""
 }
 
-func (fu *Decode) State() string {
-	return ""
+func (du *Decode) State() string {
+  return ""
 }
 
-func (fu *Decode) Cycle() {
+func (du *Decode) Cycle() {
+  for {
+    du.Recv(CYCLE)
+    du.current = du.next
+    du.Send(PIPE_DECODE_OUT, du.current)
+    du.next = du.Recv(PIPE_DECODE_IN)
+
+    //du.Send()
+
+    // Decode instructions
+    for i, _ := range du.current.([]InsIn) {
+      //fmt.Println(insn)
+      if i > 0{}
+    }
+
+  }
 }
