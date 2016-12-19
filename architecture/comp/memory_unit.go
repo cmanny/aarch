@@ -3,7 +3,6 @@ package comp
 import (
   "github.com/cmanny/aarch/architecture/ins"
   "encoding/binary"
-  "fmt"
 )
 
 type MemoryUnit struct {
@@ -38,7 +37,6 @@ func (mu *MemoryUnit) Cycle() {
       case in.Code == ins.MOV || in.Code == ins.MOVI:
         //fmt.Println("Found movi")
         out.Result = in.Op2
-        fmt.Println(in)
       case in.Code == ins.LDR:
         memOp := MemOp{}
         memOp.Op = MEM_READ

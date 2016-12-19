@@ -29,7 +29,6 @@ func (cdb* CommonDataBus) Cycle() {
 
 
     array := []InsIn{au1Out, au2Out, cuOut, muOut}
-    //fmt.Println(array)
 
     cdb.Send(CDB_RB_OUT, array)
     cdb.Send(CDB_RS_OUT, array)

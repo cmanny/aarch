@@ -1,7 +1,6 @@
 package comp
 
 import (
-  "fmt"
   "container/list"
 
   "github.com/cmanny/aarch/architecture/ins"
@@ -76,7 +75,6 @@ func (rs* ReservationStation) Cycle() {
     for _, in := range updateList {
       rs.ResolveTags(in, rs.queue.Front())
     }
-    fmt.Println(rs.queue.Len())
 
     //Look up inthe list and fill up shelves
     next := rs.queue.Front()

@@ -70,13 +70,15 @@ func (rb* ReorderBuffer) Cycle() {
     decoded := rb.Recv(PIPE_DECODE_OUT).([]InsIn)
     updateList := rb.Recv(CDB_RB_OUT).([]InsIn)
 
-    fmt.Println(updateList)
     for _, in := range updateList {
-
       if 0 < in.Tag && in.Tag < 40 {
         val, _ := rb.is.InsIdDecode(in.Code)
+        fmt.Println(in)
         if val.Ins_type != ins.TYPE_CONTROL {
           rb.UpdatePhysicalRegister(in.Tag, in.Result, true)
+          if rb.rename[in.RawOp1][0] != in.Tag {
+            rb.freeNames.PushBack(in.Tag)
+          }
         }
       }
     }
@@ -192,7 +194,7 @@ func (rb *ReorderBuffer) TagDeps(tagger InsIn, next *list.Element) {
       updatedIns.Op2Tag = tag
       updatedIns.Op2Valid = false
     }
-    if regId == updatedIns.RawOp3 && op3Type == ins.OP_REGISTER{
+    if regId == updatedIns.RawOp3 && op3Type == ins.OP_REGISTER {
       updatedIns.Op3Tag = tag
       updatedIns.Op3Valid = false
     }
